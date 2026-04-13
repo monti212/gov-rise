@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Bell, Search, User, Clock, FileText, AlertCircle, CheckCircle, Info, X, LogOut } from 'lucide-react';
+import { useRealtime } from '../../context/RealtimeContext';
+import type { Notification } from '../../context/RealtimeContext';
 
 interface UserProfile {
   fullName: string;
@@ -21,87 +23,10 @@ interface HeaderProps {
   onLogout: () => void;
 }
 
-interface Notification {
-  id: string;
-  type: 'case_update' | 'document_reminder' | 'interview' | 'policy_update' | 'system' | 'support' | 'training';
-  title: string;
-  message: string;
-  timestamp: string;
-  isRead: boolean;
-  priority: 'high' | 'medium' | 'low';
-}
-
-// Sample Australian immigration notifications
-const sampleNotifications: Notification[] = [
-  {
-    id: '1',
-    type: 'case_update',
-    title: 'Partner Visa Application Update',
-    message: 'Your Australian Partner Visa application (ID: AU-PV-2024-1234) has moved to document review stage.',
-    timestamp: '2 hours ago',
-    isRead: false,
-    priority: 'high'
-  },
-  {
-    id: '2',
-    type: 'document_reminder',
-    title: 'Document Submission Reminder',
-    message: 'Police clearance certificates are due in 5 days for your Australian visa application.',
-    timestamp: '1 day ago',
-    isRead: false,
-    priority: 'high'
-  },
-  {
-    id: '3',
-    type: 'interview',
-    title: 'Embassy Interview Scheduled',
-    message: 'Your interview at the Australian Embassy has been scheduled for December 15, 2024, 10:00 AM.',
-    timestamp: '2 days ago',
-    isRead: true,
-    priority: 'high'
-  },
-  {
-    id: '4',
-    type: 'policy_update',
-    title: 'Australian Immigration Policy Update',
-    message: 'New processing time estimates released for Partner Visa applications: 12-24 months.',
-    timestamp: '3 days ago',
-    isRead: false,
-    priority: 'medium'
-  },
-  {
-    id: '5',
-    type: 'support',
-    title: 'Support Ticket Response',
-    message: 'Your support ticket about document translation has been resolved. View response.',
-    timestamp: '4 days ago',
-    isRead: true,
-    priority: 'medium'
-  },
-  {
-    id: '6',
-    type: 'training',
-    title: 'Course Completion Certificate',
-    message: 'Congratulations! Your certificate for "Australian Partner Visa Essentials" is ready for download.',
-    timestamp: '5 days ago',
-    isRead: true,
-    priority: 'low'
-  },
-  {
-    id: '7',
-    type: 'system',
-    title: 'Scheduled Maintenance',
-    message: 'The Australian visa portal will undergo maintenance on November 30, 2024, 2:00-4:00 AM AEST.',
-    timestamp: '1 week ago',
-    isRead: false,
-    priority: 'low'
-  }
-];
-
 export const Header = ({ user, onLogout }: HeaderProps) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [notifications, setNotifications] = useState<Notification[]>(sampleNotifications);
+  const { notifications, setNotifications } = useRealtime();
   const notificationRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
 

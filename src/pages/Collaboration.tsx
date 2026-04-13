@@ -1,83 +1,6 @@
 import React, { useState } from 'react';
 import { Users, MessageSquare, Calendar, Paperclip, Search, Filter, ChevronDown, Clock, FileText, PlusCircle, Share2, Video, CheckCircle } from 'lucide-react';
-
-// Australian team members
-const teamMembers = [
-  {
-    id: 1,
-    name: 'David Wilson',
-    role: 'Australian Visa Specialist',
-    avatar: 'DW',
-    avatarColor: 'bg-blue-100',
-    textColor: 'text-blue-600',
-    status: 'online',
-    lastActive: 'Just now'
-  },
-  {
-    id: 2,
-    name: 'Priya Sharma',
-    role: 'Legal Advisor (AU)',
-    avatar: 'PS',
-    avatarColor: 'bg-green-100',
-    textColor: 'text-green-600',
-    status: 'online',
-    lastActive: '5m ago'
-  },
-  {
-    id: 3,
-    name: 'James Thompson',
-    role: 'Translator (AU)',
-    avatar: 'JT',
-    avatarColor: 'bg-purple-100',
-    textColor: 'text-purple-600',
-    status: 'away',
-    lastActive: '1h ago'
-  },
-];
-
-// Australian cases
-const cases = [
-  {
-    id: 'C-2387',
-    family: 'Rahman Family',
-    status: 'In Progress',
-    priority: 'High',
-    members: 4,
-    lastUpdate: '2 hours ago',
-    progress: 65,
-    dueDate: 'Dec 15, 2024'
-  },
-  {
-    id: 'C-2412',
-    family: 'Singh Family',
-    status: 'Documentation Review',
-    priority: 'Medium',
-    members: 3,
-    lastUpdate: '1 day ago',
-    progress: 40,
-    dueDate: 'Jan 10, 2025'
-  },
-  {
-    id: 'C-2390',
-    family: 'Liu Family',
-    status: 'Interview Scheduled',
-    priority: 'High',
-    members: 5,
-    lastUpdate: '3 days ago',
-    progress: 80,
-    dueDate: 'Nov 28, 2024'
-  },
-  {
-    id: 'C-2401',
-    family: 'Gonzalez Family',
-    status: 'Document Collection',
-    priority: 'Low',
-    members: 4,
-    lastUpdate: '5 days ago',
-    progress: 25,
-    dueDate: 'Feb 12, 2025'
-  }
-];
+import { useRealtime } from '../context/RealtimeContext';
 
 // Australian shared documents
 const sharedDocuments = [
@@ -187,6 +110,7 @@ export const Collaboration = () => {
   const [activeTab, setActiveTab] = useState('cases');
   const [searchTerm, setSearchTerm] = useState('');
   const [filterPriority, setFilterPriority] = useState('all');
+  const { teamMembers, cases, messagesThisWeek, sharedDocuments } = useRealtime();
   
   // Filtered cases based on search and filters
   const filteredCases = cases.filter(caseItem => {
@@ -222,7 +146,7 @@ export const Collaboration = () => {
             </span>
           </div>
           <div>
-            <h3 className="text-2xl font-bold text-gray-800">3</h3>
+            <h3 className="text-2xl font-bold text-gray-800">{teamMembers.filter(m => m.status === 'online').length}</h3>
             <p className="text-gray-500 text-sm">Active Team Members</p>
           </div>
         </div>
@@ -238,7 +162,7 @@ export const Collaboration = () => {
             </span>
           </div>
           <div>
-            <h3 className="text-2xl font-bold text-gray-800">4</h3>
+            <h3 className="text-2xl font-bold text-gray-800">{cases.length}</h3>
             <p className="text-gray-500 text-sm">Active Cases</p>
           </div>
         </div>
@@ -254,7 +178,7 @@ export const Collaboration = () => {
             </span>
           </div>
           <div>
-            <h3 className="text-2xl font-bold text-gray-800">24</h3>
+            <h3 className="text-2xl font-bold text-gray-800">{messagesThisWeek}</h3>
             <p className="text-gray-500 text-sm">Messages This Week</p>
           </div>
         </div>
@@ -270,7 +194,7 @@ export const Collaboration = () => {
             </span>
           </div>
           <div>
-            <h3 className="text-2xl font-bold text-gray-800">4</h3>
+            <h3 className="text-2xl font-bold text-gray-800">{sharedDocuments}</h3>
             <p className="text-gray-500 text-sm">Shared Documents</p>
           </div>
         </div>

@@ -1,62 +1,7 @@
 import React, { useState } from 'react';
 import { BarChart3, PieChart, LineChart, Download, Calendar, Filter, RefreshCw, ChevronDown, Printer, Share2, FileText, Clock, Users, CheckCircle, AlertTriangle, TrendingUp, TrendingDown, HelpCircle, ArrowRight, Globe, ArrowUpRight } from 'lucide-react';
 import { exportData, shareContent, printContent } from '../utils/actions';
-
-// Australian report summary data
-const summaryStats = [
-  {
-    title: 'Total Active Cases',
-    value: '12,572',
-    change: '+12%',
-    trend: 'up',
-    icon: <Users size={20} />,
-    color: 'blue'
-  },
-  {
-    title: 'Avg. Processing Time',
-    value: '15 months',
-    change: '-2 months',
-    trend: 'down',
-    icon: <Clock size={20} />,
-    color: 'green'
-  },
-  {
-    title: 'Approval Rate',
-    value: '72%',
-    change: '+4%',
-    trend: 'up',
-    icon: <CheckCircle size={20} />,
-    color: 'green'
-  },
-  {
-    title: 'Pending Reviews',
-    value: '3,214',
-    change: '+8%',
-    trend: 'up',
-    icon: <AlertTriangle size={20} />,
-    color: 'yellow'
-  }
-];
-
-// Australian case status distribution
-const statusDistribution = [
-  { status: 'In Progress', count: 6543, color: 'bg-blue-500' },
-  { status: 'Documentation Review', count: 3215, color: 'bg-yellow-500' },
-  { status: 'Interview Scheduled', count: 1845, color: 'bg-purple-500' },
-  { status: 'Final Approval', count: 821, color: 'bg-green-500' },
-  { status: 'Delayed', count: 148, color: 'bg-red-500' }
-];
-
-// Country data for Australian visas
-const countriesData = [
-  { country: 'India', count: 3247, trend: 'up', change: '+12%' },
-  { country: 'China', count: 2864, trend: 'up', change: '+8%' },
-  { country: 'Philippines', count: 1953, trend: 'down', change: '-3%' },
-  { country: 'Vietnam', count: 1642, trend: 'up', change: '+24%' },
-  { country: 'Malaysia', count: 1236, trend: 'down', change: '-5%' },
-  { country: 'Indonesia', count: 831, trend: 'stable', change: '0%' },
-  { country: 'Sri Lanka', count: 629, trend: 'up', change: '+7%' }
-];
+import { useRealtime } from '../context/RealtimeContext';
 
 // Processing time data for Australian visas
 const timelineData = [
@@ -136,6 +81,15 @@ export const Reports = () => {
   const [emailDelivery, setEmailDelivery] = useState(true);
   const [dashboardDelivery, setDashboardDelivery] = useState(true);
   const [apiDelivery, setApiDelivery] = useState(false);
+
+  const { activeApplications, processingTime, approvalRate, pendingReviews, statusDistribution, countriesData } = useRealtime();
+
+  const summaryStats = [
+    { title: 'Total Active Cases', value: activeApplications.toLocaleString(), change: '+12%', trend: 'up', icon: <Users size={20} />, color: 'blue' },
+    { title: 'Avg. Processing Time', value: `${processingTime} months`, change: '-2 months', trend: 'down', icon: <Clock size={20} />, color: 'green' },
+    { title: 'Approval Rate', value: `${approvalRate}%`, change: '+4%', trend: 'up', icon: <CheckCircle size={20} />, color: 'green' },
+    { title: 'Pending Reviews', value: pendingReviews.toLocaleString(), change: '+8%', trend: 'up', icon: <AlertTriangle size={20} />, color: 'yellow' },
+  ];
 
   const handleExportReport = (format: 'pdf' | 'excel' | 'csv' = 'pdf') => {
     const reportData = {

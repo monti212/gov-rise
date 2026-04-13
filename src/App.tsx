@@ -17,6 +17,7 @@ import { Sidebar } from './components/Layout/Sidebar';
 import { Header } from './components/Layout/Header';
 import { Footer } from './components/Layout/Footer';
 import { LoginPage } from './components/Auth/LoginPage';
+import { RealtimeProvider } from './context/RealtimeContext';
 
 interface LoginCredentials {
   username: string;
@@ -188,9 +189,11 @@ function App() {
 
   // Show main application if authenticated
   return (
-    <BrowserRouter>
-      <MainLayout user={user} onLogout={handleLogout} onUpdateProfile={handleUpdateProfile} />
-    </BrowserRouter>
+    <RealtimeProvider>
+      <BrowserRouter>
+        <MainLayout user={user} onLogout={handleLogout} onUpdateProfile={handleUpdateProfile} />
+      </BrowserRouter>
+    </RealtimeProvider>
   );
 }
 

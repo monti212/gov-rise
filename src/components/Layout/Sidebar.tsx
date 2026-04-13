@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { HomeIcon, BookOpen, Users, MessageSquare, BarChart3, Settings, HelpCircle, Globe, User } from 'lucide-react';
+import { HomeIcon, BookOpen, Users, MessageSquare, BarChart3, Settings, HelpCircle, Globe, User, HeartHandshake, Route } from 'lucide-react';
 
 interface UserProfile {
   fullName: string;
@@ -28,6 +28,8 @@ export const Sidebar = ({ currentPath, user }: SidebarProps) => {
   const menuItems = [
     { icon: <HomeIcon size={20} />, text: 'Home', path: '/', active: currentPath === '/' },
     { icon: <Globe size={20} />, text: 'Information Hub', path: '/information-hub', active: currentPath === '/information-hub' },
+    { icon: <Route size={20} />, text: 'Pathways', path: '/pathways', active: currentPath === '/pathways' },
+    { icon: <HeartHandshake size={20} />, text: 'Find Support', path: '/find-support', active: currentPath === '/find-support' },
     { icon: <BookOpen size={20} />, text: 'Training Portal', path: '/training', active: currentPath === '/training' },
     { icon: <Users size={20} />, text: 'Collaboration', path: '/collaboration', active: currentPath === '/collaboration' },
     { icon: <MessageSquare size={20} />, text: 'Support System', path: '/support', active: currentPath === '/support' },
@@ -47,7 +49,7 @@ export const Sidebar = ({ currentPath, user }: SidebarProps) => {
 
   // Get display role - use job title if available, otherwise default
   const getDisplayRole = () => {
-    return user.profile.jobTitle || 'Australian Visa User';
+    return user.profile.jobTitle || 'GovRise User';
   };
 
   return (

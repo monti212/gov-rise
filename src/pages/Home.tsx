@@ -4,40 +4,17 @@ import { useNavigate } from 'react-router-dom';
 import { ChatInterface } from '../components/Chat/ChatInterface';
 import { InfoCard } from '../components/Dashboard/InfoCard';
 import { StatCard } from '../components/Dashboard/StatCard';
+import { useRealtime } from '../context/RealtimeContext';
 
 export const Home = () => {
   const navigate = useNavigate();
+  const { activeApplications, processingTime, approvalRate, supportRequests } = useRealtime();
 
-  // Australian family visa statistics
   const stats = [
-    { 
-      icon: <Users size={20} />, 
-      label: 'Active Applications', 
-      value: '12,572', 
-      change: '+8%', 
-      color: 'blue' 
-    },
-    { 
-      icon: <Clock size={20} />, 
-      label: 'Avg. Processing Time', 
-      value: '15 months', 
-      change: '-2 months', 
-      color: 'green' 
-    },
-    { 
-      icon: <RefreshCw size={20} />, 
-      label: 'Approval Rate', 
-      value: '72%', 
-      change: '+3%', 
-      color: 'green' 
-    },
-    { 
-      icon: <MessageCircle size={20} />, 
-      label: 'Support Requests', 
-      value: '485', 
-      change: '+12', 
-      color: 'yellow' 
-    },
+    { icon: <Users size={20} />, label: 'Active Applications', value: activeApplications.toLocaleString(), change: '+8%', color: 'blue' as const },
+    { icon: <Clock size={20} />, label: 'Avg. Processing Time', value: `${processingTime} months`, change: '-2 months', color: 'green' as const },
+    { icon: <RefreshCw size={20} />, label: 'Approval Rate', value: `${approvalRate}%`, change: '+3%', color: 'green' as const },
+    { icon: <MessageCircle size={20} />, label: 'Support Requests', value: supportRequests.toLocaleString(), change: '+12', color: 'yellow' as const },
   ];
 
   const featuredResources = [
@@ -77,9 +54,42 @@ export const Home = () => {
 
   return (
     <div className="h-full">
+      {/* Mission & Onboarding Banner */}
+      <div className="bg-gradient-to-r from-blue-700 to-blue-500 rounded-xl p-6 mb-6 text-white">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="md:w-2/3">
+            <h1 className="text-2xl font-bold mb-1">Welcome to GovRise</h1>
+            <p className="text-blue-100 text-sm mb-3">
+              GovRise is an AI-powered refugee and family reunification platform. We help refugees, migrants, and their families understand their options, navigate legal processes, and connect with lawyers, NGOs, and support institutions — across 14 countries and multiple languages.
+            </p>
+            <div className="flex flex-wrap gap-3 text-xs">
+              <span className="bg-blue-600 bg-opacity-60 px-3 py-1 rounded-full">🌍 14 Countries</span>
+              <span className="bg-blue-600 bg-opacity-60 px-3 py-1 rounded-full">🤝 Legal & NGO Matching</span>
+              <span className="bg-blue-600 bg-opacity-60 px-3 py-1 rounded-full">🧒 UASC Support</span>
+              <span className="bg-blue-600 bg-opacity-60 px-3 py-1 rounded-full">🌐 Multi-Language</span>
+              <span className="bg-blue-600 bg-opacity-60 px-3 py-1 rounded-full">🎓 Education Pathways</span>
+            </div>
+          </div>
+          <div className="flex flex-col gap-2 md:items-end">
+            <button
+              onClick={() => navigate('/information-hub')}
+              className="bg-white text-blue-700 font-medium px-4 py-2 rounded-lg text-sm hover:bg-blue-50 transition-colors"
+            >
+              Explore Countries
+            </button>
+            <button
+              onClick={() => navigate('/find-support')}
+              className="bg-blue-600 bg-opacity-60 border border-white border-opacity-40 text-white font-medium px-4 py-2 rounded-lg text-sm hover:bg-opacity-80 transition-colors"
+            >
+              Find Legal Help
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800 mb-1">Family Reunification Dashboard</h1>
-        <p className="text-gray-600">Welcome to the GovRise Family Reunification Platform. Access tools and resources for Australian family visas.</p>
+        <h2 className="text-xl font-bold text-gray-800 mb-1">Family Reunification Dashboard</h2>
+        <p className="text-gray-600">Live platform metrics and quick access to tools and resources.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">

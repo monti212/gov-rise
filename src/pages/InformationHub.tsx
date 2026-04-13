@@ -2,15 +2,21 @@ import React, { useState } from 'react';
 import { Search, Globe, FileText, BookOpen, MapPin, HelpCircle, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-// Australian country data
 const countries = [
-  { 
-    id: 1, 
-    name: 'Australia', 
-    flag: '🇦🇺', 
-    processingTime: '12-18 months', 
-    requirements: 'High' 
-  }
+  { id: 1,  name: 'Australia',     flag: '🇦🇺', processingTime: '12–24 months',  requirements: 'High',   region: 'Oceania',       visaTypes: 'Partner, Child, Parent, Humanitarian' },
+  { id: 2,  name: 'Germany',       flag: '🇩🇪', processingTime: '6–12 months',   requirements: 'High',   region: 'Europe',        visaTypes: 'Family Reunification, Refugee Family' },
+  { id: 3,  name: 'Canada',        flag: '🇨🇦', processingTime: '12–24 months',  requirements: 'High',   region: 'North America', visaTypes: 'Spousal, Family Class, Refugee' },
+  { id: 4,  name: 'United Kingdom',flag: '🇬🇧', processingTime: '6–18 months',   requirements: 'High',   region: 'Europe',        visaTypes: 'Family Visa, Refugee Family Reunion' },
+  { id: 5,  name: 'France',        flag: '🇫🇷', processingTime: '4–12 months',   requirements: 'Medium', region: 'Europe',        visaTypes: 'Family Reunification, Protection Status' },
+  { id: 6,  name: 'Sweden',        flag: '🇸🇪', processingTime: '6–24 months',   requirements: 'Medium', region: 'Europe',        visaTypes: 'Residence Permit, Refugee Family' },
+  { id: 7,  name: 'Netherlands',   flag: '🇳🇱', processingTime: '6–18 months',   requirements: 'Medium', region: 'Europe',        visaTypes: 'MVV, Family Reunification' },
+  { id: 8,  name: 'USA',           flag: '🇺🇸', processingTime: '12–36 months',  requirements: 'High',   region: 'North America', visaTypes: 'IR, F-Series, Refugee/Asylee' },
+  { id: 9,  name: 'Turkey',        flag: '🇹🇷', processingTime: '3–9 months',    requirements: 'Medium', region: 'Asia/Europe',   visaTypes: 'Family Residence, Temporary Protection' },
+  { id: 10, name: 'Kenya',         flag: '🇰🇪', processingTime: '3–12 months',   requirements: 'Low',    region: 'Africa',        visaTypes: 'Refugee Status, UNHCR Resettlement' },
+  { id: 11, name: 'Jordan',        flag: '🇯🇴', processingTime: '3–12 months',   requirements: 'Low',    region: 'Middle East',   visaTypes: 'Refugee Registration, UNHCR Mandate' },
+  { id: 12, name: 'Lebanon',       flag: '🇱🇧', processingTime: '3–18 months',   requirements: 'Low',    region: 'Middle East',   visaTypes: 'UNHCR Registration, Temporary Stay' },
+  { id: 13, name: 'South Africa',  flag: '🇿🇦', processingTime: '6–18 months',   requirements: 'Medium', region: 'Africa',        visaTypes: 'Asylum, Refugee Permit, Family Visa' },
+  { id: 14, name: 'Uganda',        flag: '🇺🇬', processingTime: '3–9 months',    requirements: 'Low',    region: 'Africa',        visaTypes: 'Refugee Status, UNHCR Resettlement' },
 ];
 
 // Australian resources
@@ -82,11 +88,16 @@ export const InformationHub = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('countries');
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
-  
-  // Filter countries based on search term
-  const filteredCountries = countries.filter(country => 
-    country.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const [regionFilter, setRegionFilter] = useState('All');
+
+  const regions = ['All', ...Array.from(new Set(countries.map(c => c.region)))];
+
+  // Filter countries based on search term and region
+  const filteredCountries = countries.filter(country => {
+    const matchesSearch = country.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRegion = regionFilter === 'All' || country.region === regionFilter;
+    return matchesSearch && matchesRegion;
+  });
   
   // Filter resources based on search term
   const filteredResources = resources.filter(resource => 
@@ -115,7 +126,7 @@ export const InformationHub = () => {
     <div className="h-full">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-800 mb-1">Information Hub</h1>
-        <p className="text-gray-600">Comprehensive resources and information on the family reunification process in Australia and other countries.</p>
+        <p className="text-gray-600">Country-by-country guidance on family reunification pathways, visa requirements, processing times, and key authorities — covering 14 countries across 6 regions.</p>
       </div>
       
       {/* Search Bar */}
@@ -173,49 +184,59 @@ export const InformationHub = () => {
         {/* Countries Tab */}
         {activeTab === 'countries' && (
           <div className="p-4">
+            {/* Region filter pills */}
+            <div className="flex flex-wrap gap-2 mb-4">
+              {regions.map(r => (
+                <button
+                  key={r}
+                  onClick={() => setRegionFilter(r)}
+                  className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                    regionFilter === r
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  {r}
+                </button>
+              ))}
+            </div>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Country
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Processing Time
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Requirements
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Country</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Region</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Processing Time</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Requirements</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Visa Types</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {filteredCountries.map((country) => (
                     <tr key={country.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <span className="text-2xl mr-2">{country.flag}</span>
-                          <div className="text-sm font-medium text-gray-900">{country.name}</div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-2xl">{country.flag}</span>
+                          <span className="text-sm font-medium text-gray-900">{country.name}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{country.processingTime}</div>
-                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{country.region}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{country.processingTime}</td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          country.requirements === 'High' ? 'bg-red-100 text-red-800' :
+                          country.requirements === 'High'   ? 'bg-red-100 text-red-800' :
                           country.requirements === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-green-100 text-green-800'
+                                                              'bg-green-100 text-green-800'
                         }`}>
                           {country.requirements}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <button 
+                      <td className="px-6 py-4 text-sm text-gray-500 max-w-xs">{country.visaTypes}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        <button
                           onClick={() => handleViewDetails(country.name)}
-                          className="text-blue-600 hover:text-blue-900"
+                          className="text-blue-600 hover:text-blue-900 font-medium"
                         >
                           View Details
                         </button>
