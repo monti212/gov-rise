@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { supabase } from '../utils/supabase';
 
 export interface CountryData {
   country: string;
@@ -141,6 +142,114 @@ export const RealtimeProvider = ({ children }: { children: ReactNode }) => {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>(initialTeamMembers);
   const [cases, setCases] = useState<Case[]>(initialCases);
   const [notifications, setNotifications] = useState<Notification[]>(initialNotifications);
+
+  // ── Load real data from Supabase ──────────────────────────
+  useEffect(() => {
+    const loadFromSupabase = async () => {
+      // Real registration count
+      const { count: regCount } = await supabase
+        .from('registrations')
+        .select('*', { count: 'exact', head: true });
+      if (regCount && regCount > 0) {
+        setActiveApplications(prev => prev + regCount);
+      }
+
+      // Real cases
+      const { data: dbCases } = await supabase
+        .from('cases')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(20);
+      if (dbCases && dbCases.length > 0) {
+        const mapped: Case[] = dbCases.map(c => ({
+          id: c.case_id,
+          family: c.family,
+          status: c.status,
+          priority: c.priority as 'High' | 'Medium' | 'Low',
+          members: c.members,
+          lastUpdate: new Date(c.updated_at).toLocaleDateString(),
+          progress: c.progress,
+          dueDate: c.due_date || 'TBD',
+        }));
+        setCases(prev => [...mapped, ...prev].slice(0, 20));
+      }
+
+      // Real notifications for current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: dbNotifs } = await supabase
+          .from('notifications')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(20);
+        if (dbNotifs && dbNotifs.length > 0) {
+          const mapped: Notification[] = dbNotifs.map(n => ({
+            id: n.id,
+            type: n.type,
+            title: n.title,
+            message: n.message,
+            timestamp: new Date(n.created_at).toLocaleDateString(),
+            isRead: n.is_read,
+            priority: n.priority,
+          }));
+          setNotifications(prev => [...mapped, ...prev].slice(0, 20));
+        }
+      }
+    };
+
+    loadFromSupabase();
+
+    // Subscribe to realtime notifications
+    const notifChannel = supabase
+      .channel('notifications')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'notifications',
+      }, (payload) => {
+        const n = payload.new as any;
+        setNotifications(prev => [{
+          id: n.id,
+          type: n.type,
+          title: n.title,
+          message: n.message,
+          timestamp: 'just now',
+          isRead: false,
+          priority: n.priority,
+        }, ...prev].slice(0, 20));
+      })
+      .subscribe();
+
+    // Subscribe to realtime case updates
+    const casesChannel = supabase
+      .channel('cases')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'cases',
+      }, (payload) => {
+        if (payload.eventType === 'INSERT') {
+          const c = payload.new as any;
+          setCases(prev => [{
+            id: c.case_id,
+            family: c.family,
+            status: c.status,
+            priority: c.priority,
+            members: c.members,
+            lastUpdate: 'just now',
+            progress: c.progress,
+            dueDate: c.due_date || 'TBD',
+          }, ...prev].slice(0, 20));
+        }
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(notifChannel);
+      supabase.removeChannel(casesChannel);
+    };
+  }, []);
 
   useEffect(() => {
     // Active applications: +1 every 5 seconds

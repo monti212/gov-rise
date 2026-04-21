@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { User, Users, MapPin, FileText, CheckCircle, ChevronRight, ChevronLeft, AlertTriangle, Phone, Mail, Globe, Shield, Camera, Upload } from 'lucide-react';
+import { User, Users, MapPin, FileText, CheckCircle, ChevronRight, ChevronLeft, AlertTriangle, Phone, Mail, Globe, Shield, Upload } from 'lucide-react';
+import { supabase } from '../utils/supabase';
 
 const STEPS = [
   { id: 1, title: 'Personal Information', icon: <User size={18} /> },
@@ -373,6 +374,9 @@ const Step5 = ({ form }: { form: FormData }) => (
 export const Registration = () => {
   const [step, setStep] = useState(1);
   const [submitted, setSubmitted] = useState(false);
+  const [referenceNumber, setReferenceNumber] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
   const [form, setForm] = useState<FormData>(initialForm);
 
   const update = (key: string, value: any) => setForm(prev => ({ ...prev, [key]: value }));
@@ -384,7 +388,50 @@ export const Registration = () => {
     });
   };
 
-  const handleSubmit = () => setSubmitted(true);
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    setSubmitError('');
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const ref = 'GR-' + Date.now().toString().slice(-8);
+
+      const { error } = await supabase.from('registrations').insert({
+        user_id: user?.id ?? null,
+        reference_number: ref,
+        first_name: form.firstName,
+        last_name: form.lastName,
+        date_of_birth: form.dateOfBirth || null,
+        gender: form.gender,
+        nationality: form.nationality,
+        ethnicity: form.ethnicity,
+        phone: form.phone,
+        email: form.email,
+        current_country: form.currentCountry,
+        current_city: form.currentCity,
+        family_status: form.familyStatus,
+        spouse_name: form.spouseName,
+        spouse_dob: form.spouseDob || null,
+        children: form.children,
+        separated_family: form.separatedFamily,
+        separated_members: form.separatedMembers,
+        refugee_status: form.refugeeStatus,
+        displacement_date: form.displacementDate || null,
+        origin_country: form.originCountry,
+        flight_reason: form.flightReason,
+        destination_country: form.destinationCountry,
+        special_needs: form.specialNeeds,
+        documents: form.documents,
+      });
+
+      if (error) throw error;
+      setReferenceNumber(ref);
+      setSubmitted(true);
+    } catch (err: any) {
+      setSubmitError(err.message || 'Submission failed. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (submitted) {
     return (
@@ -397,7 +444,7 @@ export const Registration = () => {
           <p className="text-gray-600 mb-4">Your registration has been received. A caseworker will review your details and contact you within 2–5 business days.</p>
           <div className="bg-gray-50 rounded-lg p-4 mb-6 text-left">
             <p className="text-sm text-gray-500 mb-1">Reference Number</p>
-            <p className="font-mono font-bold text-blue-600 text-lg">GR-{Date.now().toString().slice(-8)}</p>
+            <p className="font-mono font-bold text-blue-600 text-lg">{referenceNumber}</p>
           </div>
           <button onClick={() => { setSubmitted(false); setStep(1); setForm(initialForm); }}
             className="bg-blue-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
@@ -426,6 +473,13 @@ export const Registration = () => {
           {step === 5 && <Step5 form={form} />}
         </div>
 
+        {submitError && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center space-x-2">
+            <AlertTriangle size={16} className="text-red-600 flex-shrink-0" />
+            <p className="text-sm text-red-700">{submitError}</p>
+          </div>
+        )}
+
         <div className="flex justify-between">
           <button
             onClick={() => setStep(s => Math.max(1, s - 1))}
@@ -440,9 +494,11 @@ export const Registration = () => {
               Next <ChevronRight size={16} className="ml-1" />
             </button>
           ) : (
-            <button onClick={handleSubmit}
-              className="flex items-center bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-colors">
-              <CheckCircle size={16} className="mr-1.5" /> Submit Registration
+            <button onClick={handleSubmit} disabled={isSubmitting}
+              className="flex items-center bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-colors">
+              {isSubmitting
+                ? <><div className="animate-spin h-4 w-4 border-b-2 border-white rounded-full mr-2" />Submitting...</>
+                : <><CheckCircle size={16} className="mr-1.5" /> Submit Registration</>}
             </button>
           )}
         </div>

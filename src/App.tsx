@@ -8,27 +8,24 @@ import { SupportSystem } from './pages/SupportSystem';
 import { Reports } from './pages/Reports';
 import { Settings } from './pages/Settings';
 import { HelpCenter } from './pages/HelpCenter';
+import { NoData } from './pages/NoData';
+import { CountryDetail } from './pages/CountryDetail';
+import { ResourceDetail } from './pages/ResourceDetail';
+import { CourseDetail } from './pages/CourseDetail';
+import { ArticleDetail } from './pages/ArticleDetail';
 import { Pathways } from './pages/Pathways';
 import { FindSupport } from './pages/FindSupport';
 import { UASC } from './pages/UASC';
 import { Registration } from './pages/Registration';
 import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { TermsOfService } from './pages/TermsOfService';
-import { NoData } from './pages/NoData';
-import { CountryDetail } from './pages/CountryDetail';
-import { ResourceDetail } from './pages/ResourceDetail';
-import { CourseDetail } from './pages/CourseDetail';
-import { ArticleDetail } from './pages/ArticleDetail';
 import { Sidebar } from './components/Layout/Sidebar';
 import { Header } from './components/Layout/Header';
 import { Footer } from './components/Layout/Footer';
 import { LoginPage } from './components/Auth/LoginPage';
 import { RealtimeProvider } from './context/RealtimeContext';
-
-interface LoginCredentials {
-  username: string;
-  password: string;
-}
+import { supabase } from './utils/supabase';
+import type { User, Session } from '@supabase/supabase-js';
 
 interface UserProfile {
   fullName: string;
@@ -37,21 +34,24 @@ interface UserProfile {
   phone: string;
   timeZone: string;
   language: string;
+  role: string;
 }
 
-interface User {
+interface AppUser {
+  id: string;
   username: string;
+  email: string;
   isAuthenticated: boolean;
   profile: UserProfile;
 }
 
-function MainLayout({ user, onLogout, onUpdateProfile }: { 
-  user: User; 
+function MainLayout({ user, onLogout, onUpdateProfile }: {
+  user: AppUser;
   onLogout: () => void;
   onUpdateProfile: (profile: UserProfile) => void;
 }) {
   const location = useLocation();
-  
+
   return (
     <div className="flex h-screen bg-gray-50">
       <Sidebar currentPath={location.pathname} user={user} />
@@ -62,12 +62,6 @@ function MainLayout({ user, onLogout, onUpdateProfile }: {
             <Route path="/" element={<Home />} />
             <Route path="/information-hub" element={<InformationHub />} />
             <Route path="/training" element={<TrainingPortal />} />
-            <Route path="/pathways" element={<Pathways />} />
-            <Route path="/find-support" element={<FindSupport />} />
-            <Route path="/uasc" element={<UASC />} />
-            <Route path="/registration" element={<Registration />} />
-            <Route path="/privacy" element={<PrivacyPolicy />} />
-            <Route path="/terms" element={<TermsOfService />} />
             <Route path="/collaboration" element={<Collaboration />} />
             <Route path="/support" element={<SupportSystem />} />
             <Route path="/reports" element={<Reports />} />
@@ -78,6 +72,12 @@ function MainLayout({ user, onLogout, onUpdateProfile }: {
             <Route path="/resource-detail" element={<ResourceDetail />} />
             <Route path="/course-detail" element={<CourseDetail />} />
             <Route path="/article-detail" element={<ArticleDetail />} />
+            <Route path="/pathways" element={<Pathways />} />
+            <Route path="/find-support" element={<FindSupport />} />
+            <Route path="/uasc" element={<UASC />} />
+            <Route path="/registration" element={<Registration />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsOfService />} />
           </Routes>
         </main>
         <Footer />
@@ -87,105 +87,79 @@ function MainLayout({ user, onLogout, onUpdateProfile }: {
 }
 
 function App() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AppUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load user profile from localStorage
-  const loadUserProfile = (username: string): UserProfile => {
-    try {
-      const savedProfile = localStorage.getItem(`govrise-profile-${username}`);
-      if (savedProfile) {
-        return JSON.parse(savedProfile);
-      }
-    } catch (error) {
-      console.error('Error loading user profile:', error);
-    }
-    
-    // Default profile
+  const buildAppUser = async (supabaseUser: User): Promise<AppUser> => {
+    // Fetch profile from Supabase
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', supabaseUser.id)
+      .single();
+
     return {
-      fullName: '',
-      email: '',
-      jobTitle: '',
-      phone: '',
-      timeZone: 'Australia/Sydney',
-      language: 'en'
+      id: supabaseUser.id,
+      username: profile?.full_name || supabaseUser.email?.split('@')[0] || 'user',
+      email: supabaseUser.email || '',
+      isAuthenticated: true,
+      profile: {
+        fullName: profile?.full_name || '',
+        email: supabaseUser.email || '',
+        jobTitle: profile?.job_title || '',
+        phone: profile?.phone || '',
+        timeZone: profile?.time_zone || 'UTC',
+        language: profile?.language || 'en',
+        role: profile?.role || 'refugee',
+      },
     };
   };
 
-  // Save user profile to localStorage
-  const saveUserProfile = (username: string, profile: UserProfile) => {
-    try {
-      localStorage.setItem(`govrise-profile-${username}`, JSON.stringify(profile));
-    } catch (error) {
-      console.error('Error saving user profile:', error);
-    }
-  };
-
-  // Check for existing session on app load
   useEffect(() => {
-    const checkSession = () => {
-      try {
-        const savedSession = localStorage.getItem('govrise-session');
-        if (savedSession) {
-          const session = JSON.parse(savedSession);
-          // Check if session is still valid (not expired)
-          if (session.expiresAt > Date.now()) {
-            const profile = loadUserProfile(session.username);
-            setUser({
-              username: session.username,
-              isAuthenticated: true,
-              profile
-            });
-          } else {
-            // Session expired, clear it
-            localStorage.removeItem('govrise-session');
-          }
-        }
-      } catch (error) {
-        console.error('Error checking session:', error);
-        localStorage.removeItem('govrise-session');
+    // Check for existing session
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session?.user) {
+        const appUser = await buildAppUser(session.user);
+        setUser(appUser);
       }
       setIsLoading(false);
-    };
+    });
 
-    checkSession();
+    // Listen for auth changes (login, logout, token refresh)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (_event, session: Session | null) => {
+        if (session?.user) {
+          const appUser = await buildAppUser(session.user);
+          setUser(appUser);
+        } else {
+          setUser(null);
+        }
+      }
+    );
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  const handleLogin = (credentials: LoginCredentials) => {
-    const profile = loadUserProfile(credentials.username);
-    const userData = {
-      username: credentials.username,
-      isAuthenticated: true,
-      profile
-    };
-    
-    setUser(userData);
-
-    // Save session to localStorage (expires in 24 hours)
-    const session = {
-      username: credentials.username,
-      expiresAt: Date.now() + (24 * 60 * 60 * 1000) // 24 hours
-    };
-    localStorage.setItem('govrise-session', JSON.stringify(session));
-  };
-
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
     setUser(null);
-    localStorage.removeItem('govrise-session');
   };
 
-  const handleUpdateProfile = (updatedProfile: UserProfile) => {
-    if (user) {
-      const updatedUser = {
-        ...user,
-        profile: updatedProfile
-      };
-      setUser(updatedUser);
-      saveUserProfile(user.username, updatedProfile);
-    }
+  const handleUpdateProfile = async (updatedProfile: UserProfile) => {
+    if (!user) return;
+    // Update Supabase profiles table
+    await supabase.from('profiles').update({
+      full_name: updatedProfile.fullName,
+      phone: updatedProfile.phone,
+      job_title: updatedProfile.jobTitle,
+      time_zone: updatedProfile.timeZone,
+      language: updatedProfile.language,
+      updated_at: new Date().toISOString(),
+    }).eq('id', user.id);
+
+    setUser({ ...user, profile: updatedProfile });
   };
 
-  // Show loading spinner while checking session
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -194,12 +168,10 @@ function App() {
     );
   }
 
-  // Show login page if not authenticated
   if (!user?.isAuthenticated) {
-    return <LoginPage onLogin={handleLogin} />;
+    return <LoginPage />;
   }
 
-  // Show main application if authenticated
   return (
     <RealtimeProvider>
       <BrowserRouter>
