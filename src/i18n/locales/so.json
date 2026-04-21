@@ -1,0 +1,121 @@
+{
+  "nav": {
+    "home": "Guriga",
+    "informationHub": "Xarunta Macluumaadka",
+    "pathways": "Jidadka",
+    "findSupport": "Raadi Taageero",
+    "training": "Bogga Tababarka",
+    "collaboration": "Wadashaqaynta",
+    "support": "Nidaamka Taageerada",
+    "reports": "Warbixinnada",
+    "settings": "Goobaha",
+    "help": "Xarunta Caawimada",
+    "uasc": "Ilaalinta Carruurta (UASC)",
+    "registration": "Diiwaan-gelinta"
+  },
+  "home": {
+    "welcome": "Ku soo dhawow GovRise",
+    "subtitle": "Hage ay AI ku taageerto midawga qoyska iyo taageerada qaxootiga",
+    "getStarted": "Bilow",
+    "learnMore": "Wax Badan Baro"
+  },
+  "common": {
+    "search": "Raadi",
+    "filter": "Shaandheey",
+    "submit": "Gudbi",
+    "cancel": "Jooji",
+    "save": "Keydi",
+    "next": "Xiga",
+    "previous": "Hore",
+    "loading": "Waa la soo raraya...",
+    "error": "Khalad ayaa dhacay",
+    "success": "Guul",
+    "required": "Waajib",
+    "optional": "Ikhtiyaari",
+    "viewAll": "Arag Dhammaan",
+    "learnMore": "Wax Badan Baro",
+    "contactUs": "Nala Xiriir",
+    "getHelp": "Hel Caawimo",
+    "language": "Luqadda"
+  },
+  "auth": {
+    "login": "Gal",
+    "logout": "Ka Bax",
+    "register": "Samee Akoon",
+    "username": "Magaca Isticmaalaha",
+    "password": "Furaha Sirta",
+    "email": "Cinwaanka Emailka",
+    "fullName": "Magaca Buuxa",
+    "forgotPassword": "Ma ilowday furaha sirta?",
+    "noAccount": "Akoon ma lihid?",
+    "haveAccount": "Horay akoon ma u lahayd?",
+    "loginSuccess": "Si guul leh ayaad u gashay",
+    "loginError": "Magaca isticmaalaha ama furaha sirta waa khalad"
+  },
+  "onboarding": {
+    "step1Title": "Dooro Wadankaaga",
+    "step1Desc": "Xaggee ayaad hadda joogtaa?",
+    "step2Title": "Xaaladaada",
+    "step2Desc": "Naga caawi si aan u fahanno xaaladaada",
+    "step3Title": "Bartilmaameedkaaga",
+    "step3Desc": "Maxaad raadinaysaa?",
+    "step4Title": "Hagidda Diyaar Ayay Tahay",
+    "step4Desc": "Kani waa hagidda khaaska ah ee kuu togan",
+    "refugee": "Waxaan ahay qaxooti ama codsade asayl",
+    "familyMember": "Waxaa ii jira qoys dibadda ah oo aan doonayo inaan la midawgo",
+    "supporter": "Waxaan ahay shaqaale arrimaha bulshada ama taageere",
+    "ngo": "Waxaan ka matalaa urur aan dowlad ahayn"
+  },
+  "registration": {
+    "title": "Diiwaan-gelinta Qaxootiga",
+    "subtitle": "Diiwaangeli shakhsiyaadka iyo qoysaska si ay ugu helaan taageerada iyo adeegyada midawga qoyska",
+    "personalInfo": "Macluumaadka Shakhsiga",
+    "familyMembers": "Xubnaha Qoyska",
+    "currentSituation": "Xaaladda Hadda",
+    "documents": "Dukumentiyada",
+    "reviewSubmit": "Dib u eeg oo Gudbi",
+    "firstName": "Magaca Koowaad",
+    "lastName": "Magaca Dambe",
+    "dateOfBirth": "Taariikhda Dhalashada",
+    "gender": "Jinsiga",
+    "nationality": "Jinsiyadda",
+    "submitted": "Diiwaan-gelinta Waa La Gudbiyay",
+    "referenceNumber": "Lambarka Tixraaca"
+  },
+  "findSupport": {
+    "title": "Raadi Taageero",
+    "subtitle": "La xiriir qareenada, NGO-yada, hay'adaha dowladda, iyo adeegyada taageerada",
+    "searchPlaceholder": "Raadi magaca, adeegga, ama erayga furaha...",
+    "availableNow": "Kuwa hadda jooga kaliya",
+    "requestHelp": "Codso Caawimo",
+    "callNow": "Hadda Wac",
+    "emergency": "Khatar degdeg ah miyaad ku jirtaa?"
+  },
+  "pathways": {
+    "title": "Jidadka",
+    "subtitle": "Baadh jidadka la heli karo ee midawga qoyska, waxbarashada, shaqada, iyo deeqsanaanta",
+    "family": "Midawga Qoyska",
+    "education": "Waxbarashada",
+    "work": "Fursadaha Shaqada",
+    "sponsorship": "Deeqsanaanta",
+    "processingTime": "Wakhtiga Habraaca",
+    "eligibility": "Xaquujinta",
+    "availableIn": "Laga Heli Karo"
+  },
+  "uasc": {
+    "title": "Carruurta Aan La Raacin iyo Kala Qaybsanaanta (UASC)",
+    "subtitle": "Taageero gaar ah iyo hagid loogu talagalay carruurta yaryar ee aan la raacin",
+    "accessGateTitle": "Qaybta Ilaalinta",
+    "accessGateDesc": "Qaybtani waxay u taagan tahay dadka waaweyn ee mas'uulka ah, shaqaalaha arrimaha bulshada, iyo taageerayaasha oggolaansan kaliya.",
+    "guardian": "Waalid ama Maamule Sharciga ah",
+    "caseworker": "Shaqaale Xaaladaha / Shaqaalaha NGO",
+    "legal": "Wakiilka Sharciga",
+    "government": "Saraakiisha Dowladda"
+  },
+  "footer": {
+    "privacy": "Siyaasadda Xogta Gaarka ah",
+    "terms": "Shuruudaha Adeegga",
+    "contact": "Xiriir",
+    "rights": "Dhammaan xuquuqda way ilaalinayaan"
+  }
+}

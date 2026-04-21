@@ -8,6 +8,12 @@ import { SupportSystem } from './pages/SupportSystem';
 import { Reports } from './pages/Reports';
 import { Settings } from './pages/Settings';
 import { HelpCenter } from './pages/HelpCenter';
+import { Pathways } from './pages/Pathways';
+import { FindSupport } from './pages/FindSupport';
+import { UASC } from './pages/UASC';
+import { Registration } from './pages/Registration';
+import { PrivacyPolicy } from './pages/PrivacyPolicy';
+import { TermsOfService } from './pages/TermsOfService';
 import { NoData } from './pages/NoData';
 import { CountryDetail } from './pages/CountryDetail';
 import { ResourceDetail } from './pages/ResourceDetail';
@@ -56,6 +62,12 @@ function MainLayout({ user, onLogout, onUpdateProfile }: {
             <Route path="/" element={<Home />} />
             <Route path="/information-hub" element={<InformationHub />} />
             <Route path="/training" element={<TrainingPortal />} />
+            <Route path="/pathways" element={<Pathways />} />
+            <Route path="/find-support" element={<FindSupport />} />
+            <Route path="/uasc" element={<UASC />} />
+            <Route path="/registration" element={<Registration />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsOfService />} />
             <Route path="/collaboration" element={<Collaboration />} />
             <Route path="/support" element={<SupportSystem />} />
             <Route path="/reports" element={<Reports />} />

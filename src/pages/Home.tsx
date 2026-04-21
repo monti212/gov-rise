@@ -1,13 +1,26 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BarChart3, Clock, Users, Search, MessageCircle, FileText, RefreshCw, Globe, Laptop } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ChatInterface } from '../components/Chat/ChatInterface';
 import { InfoCard } from '../components/Dashboard/InfoCard';
 import { StatCard } from '../components/Dashboard/StatCard';
 import { useRealtime } from '../context/RealtimeContext';
+import { OnboardingWizard } from '../components/Onboarding/OnboardingWizard';
 
 export const Home = () => {
   const navigate = useNavigate();
+  const [showWizard, setShowWizard] = useState(false);
+
+  // Auto-show wizard for first-time visitors
+  useEffect(() => {
+    const seen = localStorage.getItem('govrise-onboarding-done');
+    if (!seen) setShowWizard(true);
+  }, []);
+
+  const handleWizardClose = () => {
+    setShowWizard(false);
+    localStorage.setItem('govrise-onboarding-done', 'true');
+  };
   const { activeApplications, processingTime, approvalRate, supportRequests } = useRealtime();
 
   const stats = [
@@ -54,6 +67,7 @@ export const Home = () => {
 
   return (
     <div className="h-full">
+      {showWizard && <OnboardingWizard onClose={handleWizardClose} onNavigate={navigate} />}
       {/* Mission & Onboarding Banner */}
       <div className="bg-gradient-to-r from-blue-700 to-blue-500 rounded-xl p-6 mb-6 text-white">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -72,8 +86,14 @@ export const Home = () => {
           </div>
           <div className="flex flex-col gap-2 md:items-end">
             <button
+              onClick={() => setShowWizard(true)}
+              className="bg-white text-blue-700 font-medium px-4 py-2 rounded-lg text-sm hover:bg-blue-50 transition-colors flex items-center gap-2"
+            >
+              ✨ Get Guided
+            </button>
+            <button
               onClick={() => navigate('/information-hub')}
-              className="bg-white text-blue-700 font-medium px-4 py-2 rounded-lg text-sm hover:bg-blue-50 transition-colors"
+              className="bg-blue-600 bg-opacity-60 border border-white border-opacity-40 text-white font-medium px-4 py-2 rounded-lg text-sm hover:bg-opacity-80 transition-colors"
             >
               Explore Countries
             </button>

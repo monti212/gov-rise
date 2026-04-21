@@ -1,0 +1,121 @@
+{
+  "nav": {
+    "home": "Home",
+    "informationHub": "Information Hub",
+    "pathways": "Pathways",
+    "findSupport": "Find Support",
+    "training": "Training Portal",
+    "collaboration": "Collaboration",
+    "support": "Support System",
+    "reports": "Reports",
+    "settings": "Settings",
+    "help": "Help Center",
+    "uasc": "Child Protection (UASC)",
+    "registration": "Register"
+  },
+  "home": {
+    "welcome": "Welcome to GovRise",
+    "subtitle": "AI-powered guidance for family reunification and refugee support",
+    "getStarted": "Get Started",
+    "learnMore": "Learn More"
+  },
+  "common": {
+    "search": "Search",
+    "filter": "Filter",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "next": "Next",
+    "previous": "Previous",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "required": "Required",
+    "optional": "Optional",
+    "viewAll": "View All",
+    "learnMore": "Learn More",
+    "contactUs": "Contact Us",
+    "getHelp": "Get Help",
+    "language": "Language"
+  },
+  "auth": {
+    "login": "Sign In",
+    "logout": "Sign Out",
+    "register": "Create Account",
+    "username": "Username",
+    "password": "Password",
+    "email": "Email Address",
+    "fullName": "Full Name",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?",
+    "loginSuccess": "Signed in successfully",
+    "loginError": "Invalid username or password"
+  },
+  "onboarding": {
+    "step1Title": "Select Your Country",
+    "step1Desc": "Where are you currently located?",
+    "step2Title": "Your Situation",
+    "step2Desc": "Help us understand your circumstances",
+    "step3Title": "Your Goal",
+    "step3Desc": "What are you trying to achieve?",
+    "step4Title": "Guidance Ready",
+    "step4Desc": "Here is your personalised guidance",
+    "refugee": "I am a refugee or asylum seeker",
+    "familyMember": "I have family abroad I want to reunite with",
+    "supporter": "I am a caseworker or supporter",
+    "ngo": "I represent an NGO or organisation"
+  },
+  "registration": {
+    "title": "Refugee Registration",
+    "subtitle": "Register individuals and families to access support and family reunification services",
+    "personalInfo": "Personal Information",
+    "familyMembers": "Family Members",
+    "currentSituation": "Current Situation",
+    "documents": "Documents",
+    "reviewSubmit": "Review & Submit",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "dateOfBirth": "Date of Birth",
+    "gender": "Gender",
+    "nationality": "Nationality",
+    "submitted": "Registration Submitted",
+    "referenceNumber": "Reference Number"
+  },
+  "findSupport": {
+    "title": "Find Support",
+    "subtitle": "Connect with lawyers, NGOs, government agencies, and support services",
+    "searchPlaceholder": "Search by name, service, or keyword...",
+    "availableNow": "Available now only",
+    "requestHelp": "Request Help",
+    "callNow": "Call Now",
+    "emergency": "In immediate danger or emergency?"
+  },
+  "pathways": {
+    "title": "Pathways",
+    "subtitle": "Explore available pathways for family reunification, education, work, and sponsorship",
+    "family": "Family Reunification",
+    "education": "Education",
+    "work": "Work Opportunities",
+    "sponsorship": "Sponsorship",
+    "processingTime": "Processing Time",
+    "eligibility": "Eligibility",
+    "availableIn": "Available In"
+  },
+  "uasc": {
+    "title": "Unaccompanied & Separated Children (UASC)",
+    "subtitle": "Specialised support and guidance for unaccompanied minors and their authorised supporters",
+    "accessGateTitle": "Protected Section",
+    "accessGateDesc": "This section is for responsible adults, caseworkers, NGO staff, and authorised supporters only.",
+    "guardian": "Parent or Legal Guardian",
+    "caseworker": "Caseworker / NGO Staff",
+    "legal": "Legal Representative",
+    "government": "Government Official"
+  },
+  "footer": {
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "contact": "Contact",
+    "rights": "All rights reserved"
+  }
+}

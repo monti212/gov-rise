@@ -62,10 +62,10 @@ export const Footer = () => {
         </div>
 
         <div className="flex space-x-4">
-          <button onClick={() => handleLinkClick('Privacy Policy')} className="hover:text-blue-600 transition-colors">
+          <button onClick={() => navigate('/privacy')} className="hover:text-blue-600 transition-colors">
             Privacy Policy
           </button>
-          <button onClick={() => handleLinkClick('Terms of Service')} className="hover:text-blue-600 transition-colors">
+          <button onClick={() => navigate('/terms')} className="hover:text-blue-600 transition-colors">
             Terms of Service
           </button>
           <button onClick={() => handleLinkClick('Contact')} className="hover:text-blue-600 transition-colors">

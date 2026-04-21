@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Bell, Search, User, Clock, FileText, AlertCircle, CheckCircle, Info, X, LogOut } from 'lucide-react';
 import { useRealtime } from '../../context/RealtimeContext';
 import type { Notification } from '../../context/RealtimeContext';
+import { LanguageSwitcher } from '../LanguageSwitcher';
 
 interface UserProfile {
   fullName: string;
@@ -125,6 +126,9 @@ export const Header = ({ user, onLogout }: HeaderProps) => {
         </div>
       </div>
       <div className="flex items-center space-x-3">
+        {/* Language Switcher */}
+        <LanguageSwitcher />
+        <div className="h-8 w-px bg-gray-300"></div>
         {/* Notifications */}
         <div className="relative" ref={notificationRef}>
           <button 

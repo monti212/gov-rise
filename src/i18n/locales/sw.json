@@ -1,0 +1,121 @@
+{
+  "nav": {
+    "home": "Nyumbani",
+    "informationHub": "Kituo cha Habari",
+    "pathways": "Njia",
+    "findSupport": "Tafuta Msaada",
+    "training": "Lango la Mafunzo",
+    "collaboration": "Ushirikiano",
+    "support": "Mfumo wa Msaada",
+    "reports": "Ripoti",
+    "settings": "Mipangilio",
+    "help": "Kituo cha Usaidizi",
+    "uasc": "Ulinzi wa Mtoto (UASC)",
+    "registration": "Usajili"
+  },
+  "home": {
+    "welcome": "Karibu GovRise",
+    "subtitle": "Mwongozo unaotumia AI kwa kuungana upya kwa familia na msaada wa wakimbizi",
+    "getStarted": "Anza",
+    "learnMore": "Jifunze Zaidi"
+  },
+  "common": {
+    "search": "Tafuta",
+    "filter": "Chuja",
+    "submit": "Wasilisha",
+    "cancel": "Ghairi",
+    "save": "Hifadhi",
+    "next": "Inayofuata",
+    "previous": "Iliyotangulia",
+    "loading": "Inapakia...",
+    "error": "Hitilafu imetokea",
+    "success": "Mafanikio",
+    "required": "Inahitajika",
+    "optional": "Hiari",
+    "viewAll": "Ona Yote",
+    "learnMore": "Jifunze Zaidi",
+    "contactUs": "Wasiliana Nasi",
+    "getHelp": "Pata Msaada",
+    "language": "Lugha"
+  },
+  "auth": {
+    "login": "Ingia",
+    "logout": "Toka",
+    "register": "Fungua Akaunti",
+    "username": "Jina la Mtumiaji",
+    "password": "Nenosiri",
+    "email": "Barua Pepe",
+    "fullName": "Jina Kamili",
+    "forgotPassword": "Umesahau nenosiri?",
+    "noAccount": "Huna akaunti?",
+    "haveAccount": "Una akaunti tayari?",
+    "loginSuccess": "Umeingia mafanikio",
+    "loginError": "Jina la mtumiaji au nenosiri lisilo sahihi"
+  },
+  "onboarding": {
+    "step1Title": "Chagua Nchi Yako",
+    "step1Desc": "Uko wapi sasa hivi?",
+    "step2Title": "Hali Yako",
+    "step2Desc": "Tusaidie kuelewa hali yako",
+    "step3Title": "Lengo Lako",
+    "step3Desc": "Unataka kufanikisha nini?",
+    "step4Title": "Mwongozo Uko Tayari",
+    "step4Desc": "Hapa kuna mwongozo wako wa kibinafsi",
+    "refugee": "Mimi ni mkimbizi au mtafuta hifadhi",
+    "familyMember": "Nina familia nje ambayo nataka kuunganika nayo",
+    "supporter": "Mimi ni mfanyakazi wa kijamii au msaidizi",
+    "ngo": "Ninawakilisha shirika lisilo la kiserikali"
+  },
+  "registration": {
+    "title": "Usajili wa Wakimbizi",
+    "subtitle": "Sajili watu binafsi na familia kupata msaada na huduma za kuungana upya",
+    "personalInfo": "Taarifa za Kibinafsi",
+    "familyMembers": "Wanafamilia",
+    "currentSituation": "Hali ya Sasa",
+    "documents": "Nyaraka",
+    "reviewSubmit": "Kagua na Wasilisha",
+    "firstName": "Jina la Kwanza",
+    "lastName": "Jina la Ukoo",
+    "dateOfBirth": "Tarehe ya Kuzaliwa",
+    "gender": "Jinsia",
+    "nationality": "Utaifa",
+    "submitted": "Usajili Umewasilishwa",
+    "referenceNumber": "Nambari ya Kumbukumbu"
+  },
+  "findSupport": {
+    "title": "Tafuta Msaada",
+    "subtitle": "Unganika na mawakili, mashirika yasiyo ya kiserikali, na huduma za msaada",
+    "searchPlaceholder": "Tafuta kwa jina, huduma, au neno kuu...",
+    "availableNow": "Wanapatikana sasa tu",
+    "requestHelp": "Omba Msaada",
+    "callNow": "Piga Simu Sasa",
+    "emergency": "Uko katika hatari ya haraka?"
+  },
+  "pathways": {
+    "title": "Njia",
+    "subtitle": "Chunguza njia zinazopatikana kwa kuungana kwa familia, elimu, kazi, na udhamini",
+    "family": "Kuungana kwa Familia",
+    "education": "Elimu",
+    "work": "Fursa za Kazi",
+    "sponsorship": "Udhamini",
+    "processingTime": "Muda wa Usindikaji",
+    "eligibility": "Ustahili",
+    "availableIn": "Inapatikana Katika"
+  },
+  "uasc": {
+    "title": "Watoto Wasio na Msaidizi na Waliotengwa (UASC)",
+    "subtitle": "Msaada maalum na mwongozo kwa watoto wadogo wasio na msaidizi",
+    "accessGateTitle": "Sehemu Iliyolindwa",
+    "accessGateDesc": "Sehemu hii ni kwa watu wazima wanaohusika, wafanyakazi wa kijamii, na wasaidizi walioidhinishwa tu.",
+    "guardian": "Mzazi au Mlezi wa Kisheria",
+    "caseworker": "Mfanyakazi wa Kijamii / Wafanyakazi wa Shirika",
+    "legal": "Mwakilishi wa Kisheria",
+    "government": "Afisa wa Serikali"
+  },
+  "footer": {
+    "privacy": "Sera ya Faragha",
+    "terms": "Masharti ya Huduma",
+    "contact": "Wasiliana",
+    "rights": "Haki zote zimehifadhiwa"
+  }
+}

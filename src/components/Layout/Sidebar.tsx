@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { HomeIcon, BookOpen, Users, MessageSquare, BarChart3, Settings, HelpCircle, Globe, User, HeartHandshake, Route } from 'lucide-react';
+import { HomeIcon, BookOpen, Users, MessageSquare, BarChart3, Settings, HelpCircle, Globe, User, HeartHandshake, Route, Shield, ClipboardList } from 'lucide-react';
 
 interface UserProfile {
   fullName: string;
@@ -31,6 +31,8 @@ export const Sidebar = ({ currentPath, user }: SidebarProps) => {
     { icon: <Route size={20} />, text: 'Pathways', path: '/pathways', active: currentPath === '/pathways' },
     { icon: <HeartHandshake size={20} />, text: 'Find Support', path: '/find-support', active: currentPath === '/find-support' },
     { icon: <BookOpen size={20} />, text: 'Training Portal', path: '/training', active: currentPath === '/training' },
+    { icon: <Shield size={20} />, text: 'Child Protection', path: '/uasc', active: currentPath === '/uasc' },
+    { icon: <ClipboardList size={20} />, text: 'Registration', path: '/registration', active: currentPath === '/registration' },
     { icon: <Users size={20} />, text: 'Collaboration', path: '/collaboration', active: currentPath === '/collaboration' },
     { icon: <MessageSquare size={20} />, text: 'Support System', path: '/support', active: currentPath === '/support' },
     { icon: <BarChart3 size={20} />, text: 'Reports', path: '/reports', active: currentPath === '/reports' },

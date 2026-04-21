@@ -1,0 +1,121 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "informationHub": "Centre d'information",
+    "pathways": "Parcours",
+    "findSupport": "Trouver du soutien",
+    "training": "Portail de formation",
+    "collaboration": "Collaboration",
+    "support": "Système de soutien",
+    "reports": "Rapports",
+    "settings": "Paramètres",
+    "help": "Centre d'aide",
+    "uasc": "Protection de l'enfant (MSNA)",
+    "registration": "Inscription"
+  },
+  "home": {
+    "welcome": "Bienvenue sur GovRise",
+    "subtitle": "Orientation assistée par IA pour le regroupement familial et le soutien aux réfugiés",
+    "getStarted": "Commencer",
+    "learnMore": "En savoir plus"
+  },
+  "common": {
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "submit": "Soumettre",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "loading": "Chargement...",
+    "error": "Une erreur s'est produite",
+    "success": "Succès",
+    "required": "Obligatoire",
+    "optional": "Optionnel",
+    "viewAll": "Voir tout",
+    "learnMore": "En savoir plus",
+    "contactUs": "Nous contacter",
+    "getHelp": "Obtenir de l'aide",
+    "language": "Langue"
+  },
+  "auth": {
+    "login": "Se connecter",
+    "logout": "Se déconnecter",
+    "register": "Créer un compte",
+    "username": "Nom d'utilisateur",
+    "password": "Mot de passe",
+    "email": "Adresse e-mail",
+    "fullName": "Nom complet",
+    "forgotPassword": "Mot de passe oublié ?",
+    "noAccount": "Pas encore de compte ?",
+    "haveAccount": "Vous avez déjà un compte ?",
+    "loginSuccess": "Connexion réussie",
+    "loginError": "Nom d'utilisateur ou mot de passe incorrect"
+  },
+  "onboarding": {
+    "step1Title": "Sélectionnez votre pays",
+    "step1Desc": "Où êtes-vous actuellement ?",
+    "step2Title": "Votre situation",
+    "step2Desc": "Aidez-nous à comprendre vos circonstances",
+    "step3Title": "Votre objectif",
+    "step3Desc": "Qu'essayez-vous d'accomplir ?",
+    "step4Title": "Orientation prête",
+    "step4Desc": "Voici vos conseils personnalisés",
+    "refugee": "Je suis réfugié ou demandeur d'asile",
+    "familyMember": "J'ai de la famille à l'étranger que je veux retrouver",
+    "supporter": "Je suis travailleur social ou soutien",
+    "ngo": "Je représente une ONG ou une organisation"
+  },
+  "registration": {
+    "title": "Enregistrement des réfugiés",
+    "subtitle": "Enregistrez des individus et des familles pour accéder au soutien et aux services de regroupement familial",
+    "personalInfo": "Informations personnelles",
+    "familyMembers": "Membres de la famille",
+    "currentSituation": "Situation actuelle",
+    "documents": "Documents",
+    "reviewSubmit": "Vérifier et soumettre",
+    "firstName": "Prénom",
+    "lastName": "Nom de famille",
+    "dateOfBirth": "Date de naissance",
+    "gender": "Genre",
+    "nationality": "Nationalité",
+    "submitted": "Inscription soumise",
+    "referenceNumber": "Numéro de référence"
+  },
+  "findSupport": {
+    "title": "Trouver du soutien",
+    "subtitle": "Connectez-vous avec des avocats, ONG, agences gouvernementales et services d'assistance",
+    "searchPlaceholder": "Rechercher par nom, service ou mot-clé...",
+    "availableNow": "Disponibles maintenant uniquement",
+    "requestHelp": "Demander de l'aide",
+    "callNow": "Appeler maintenant",
+    "emergency": "En danger immédiat ou urgence ?"
+  },
+  "pathways": {
+    "title": "Parcours",
+    "subtitle": "Explorez les parcours disponibles pour le regroupement familial, l'éducation, le travail et le parrainage",
+    "family": "Regroupement familial",
+    "education": "Éducation",
+    "work": "Opportunités de travail",
+    "sponsorship": "Parrainage",
+    "processingTime": "Délai de traitement",
+    "eligibility": "Éligibilité",
+    "availableIn": "Disponible dans"
+  },
+  "uasc": {
+    "title": "Mineurs Non Accompagnés et Séparés (MSNA)",
+    "subtitle": "Soutien spécialisé et orientation pour les mineurs non accompagnés et leurs soutiens autorisés",
+    "accessGateTitle": "Section protégée",
+    "accessGateDesc": "Cette section est réservée aux adultes responsables, travailleurs sociaux, personnel d'ONG et soutiens autorisés.",
+    "guardian": "Parent ou tuteur légal",
+    "caseworker": "Travailleur social / Personnel ONG",
+    "legal": "Représentant légal",
+    "government": "Fonctionnaire gouvernemental"
+  },
+  "footer": {
+    "privacy": "Politique de confidentialité",
+    "terms": "Conditions d'utilisation",
+    "contact": "Contact",
+    "rights": "Tous droits réservés"
+  }
+}

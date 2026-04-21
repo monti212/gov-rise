@@ -1,0 +1,121 @@
+{
+  "nav": {
+    "home": "Ana Sayfa",
+    "informationHub": "Bilgi Merkezi",
+    "pathways": "Yollar",
+    "findSupport": "Destek Bul",
+    "training": "Eğitim Portalı",
+    "collaboration": "İşbirliği",
+    "support": "Destek Sistemi",
+    "reports": "Raporlar",
+    "settings": "Ayarlar",
+    "help": "Yardım Merkezi",
+    "uasc": "Çocuk Koruma (UASC)",
+    "registration": "Kayıt"
+  },
+  "home": {
+    "welcome": "GovRise'a Hoş Geldiniz",
+    "subtitle": "Aile birleşimi ve mülteci desteği için yapay zeka destekli rehberlik",
+    "getStarted": "Başla",
+    "learnMore": "Daha Fazla Bilgi"
+  },
+  "common": {
+    "search": "Ara",
+    "filter": "Filtrele",
+    "submit": "Gönder",
+    "cancel": "İptal",
+    "save": "Kaydet",
+    "next": "İleri",
+    "previous": "Geri",
+    "loading": "Yükleniyor...",
+    "error": "Bir hata oluştu",
+    "success": "Başarılı",
+    "required": "Gerekli",
+    "optional": "İsteğe bağlı",
+    "viewAll": "Tümünü Gör",
+    "learnMore": "Daha Fazla Bilgi",
+    "contactUs": "Bize Ulaşın",
+    "getHelp": "Yardım Al",
+    "language": "Dil"
+  },
+  "auth": {
+    "login": "Giriş Yap",
+    "logout": "Çıkış Yap",
+    "register": "Hesap Oluştur",
+    "username": "Kullanıcı Adı",
+    "password": "Şifre",
+    "email": "E-posta Adresi",
+    "fullName": "Tam Ad",
+    "forgotPassword": "Şifremi unuttum?",
+    "noAccount": "Hesabınız yok mu?",
+    "haveAccount": "Zaten hesabınız var mı?",
+    "loginSuccess": "Başarıyla giriş yapıldı",
+    "loginError": "Geçersiz kullanıcı adı veya şifre"
+  },
+  "onboarding": {
+    "step1Title": "Ülkenizi Seçin",
+    "step1Desc": "Şu anda neredesiniz?",
+    "step2Title": "Durumunuz",
+    "step2Desc": "Koşullarınızı anlamamıza yardımcı olun",
+    "step3Title": "Hedefiniz",
+    "step3Desc": "Ne başarmaya çalışıyorsunuz?",
+    "step4Title": "Rehberlik Hazır",
+    "step4Desc": "İşte kişiselleştirilmiş rehberliğiniz",
+    "refugee": "Mülteci veya sığınmacıyım",
+    "familyMember": "Yurt dışında birleşmek istediğim ailem var",
+    "supporter": "Sosyal hizmet uzmanı veya destekçiyim",
+    "ngo": "Bir STK veya kuruluşu temsil ediyorum"
+  },
+  "registration": {
+    "title": "Mülteci Kaydı",
+    "subtitle": "Destek ve aile birleşimi hizmetlerine erişmek için kişileri ve aileleri kaydedin",
+    "personalInfo": "Kişisel Bilgiler",
+    "familyMembers": "Aile Üyeleri",
+    "currentSituation": "Mevcut Durum",
+    "documents": "Belgeler",
+    "reviewSubmit": "İncele ve Gönder",
+    "firstName": "Ad",
+    "lastName": "Soyad",
+    "dateOfBirth": "Doğum Tarihi",
+    "gender": "Cinsiyet",
+    "nationality": "Uyruk",
+    "submitted": "Kayıt Gönderildi",
+    "referenceNumber": "Referans Numarası"
+  },
+  "findSupport": {
+    "title": "Destek Bul",
+    "subtitle": "Avukatlar, STK'lar, devlet kurumları ve destek hizmetleriyle bağlantı kurun",
+    "searchPlaceholder": "İsim, hizmet veya anahtar kelimeyle arayın...",
+    "availableNow": "Yalnızca şu anda müsaitler",
+    "requestHelp": "Yardım İste",
+    "callNow": "Şimdi Ara",
+    "emergency": "Anlık tehlikede veya acil durumda mısınız?"
+  },
+  "pathways": {
+    "title": "Yollar",
+    "subtitle": "Aile birleşimi, eğitim, iş ve sponsorluk için mevcut yolları keşfedin",
+    "family": "Aile Birleşimi",
+    "education": "Eğitim",
+    "work": "İş Fırsatları",
+    "sponsorship": "Sponsorluk",
+    "processingTime": "İşlem Süresi",
+    "eligibility": "Uygunluk",
+    "availableIn": "Mevcut Olduğu Ülkeler"
+  },
+  "uasc": {
+    "title": "Refakatsiz ve Ayrılmış Çocuklar (UASC)",
+    "subtitle": "Refakatsiz küçükler ve yetkili destekçileri için özel destek ve rehberlik",
+    "accessGateTitle": "Korunan Bölüm",
+    "accessGateDesc": "Bu bölüm yalnızca sorumlu yetişkinler, sosyal hizmet uzmanları, STK personeli ve yetkili destekçiler içindir.",
+    "guardian": "Ebeveyn veya Yasal Vasi",
+    "caseworker": "Sosyal Hizmet Uzmanı / STK Personeli",
+    "legal": "Yasal Temsilci",
+    "government": "Devlet Yetkilisi"
+  },
+  "footer": {
+    "privacy": "Gizlilik Politikası",
+    "terms": "Hizmet Şartları",
+    "contact": "İletişim",
+    "rights": "Tüm hakları saklıdır"
+  }
+}
