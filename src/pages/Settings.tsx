@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { UserCircle, Bell, Globe, Shield, Moon, LogOut, Save, ChevronDown, CheckCircle, Mail, Smartphone, Lock, Eye, EyeOff, ToggleLeft as Toggle, RefreshCw, AlertCircle } from 'lucide-react';
+import { supabase } from '../utils/supabase';
 
 interface UserProfile {
   fullName: string;
@@ -68,32 +69,11 @@ export const Settings = ({ user, onUpdateProfile }: SettingsProps) => {
   const [saveStatus, setSaveStatus] = useState<null | 'saving' | 'saved' | 'error'>(null);
   const [credentialUpdateStatus, setCredentialUpdateStatus] = useState<null | 'saving' | 'saved' | 'error'>(null);
 
-  // Load current credentials on component mount
+  // No localStorage credentials needed — Supabase handles auth
   useEffect(() => {
-    const loadCredentials = () => {
-      try {
-        const stored = localStorage.getItem('govrise-credentials');
-        if (stored) {
-          const credentials = JSON.parse(stored);
-          setCurrentCredentials(credentials);
-          setNewUsername(credentials.username);
-        } else {
-          // Default credentials
-          const defaultCredentials = { username: 'admin', password: 'govrise2024' };
-          setCurrentCredentials(defaultCredentials);
-          setNewUsername(defaultCredentials.username);
-          // Save default credentials to localStorage
-          localStorage.setItem('govrise-credentials', JSON.stringify(defaultCredentials));
-        }
-      } catch (error) {
-        console.error('Error loading credentials:', error);
-        const defaultCredentials = { username: 'admin', password: 'govrise2024' };
-        setCurrentCredentials(defaultCredentials);
-        setNewUsername(defaultCredentials.username);
-      }
-    };
-
-    loadCredentials();
+    supabase.auth.getUser().then(({ data: { user: u } }) => {
+      if (u) setNewUsername(u.email || '');
+    });
   }, []);
 
   // Update local state when user profile changes
@@ -106,80 +86,51 @@ export const Settings = ({ user, onUpdateProfile }: SettingsProps) => {
     setLanguage(user.profile.language);
   }, [user.profile]);
   
-  const handleSaveSettings = () => {
+  const handleSaveSettings = async () => {
     setSaveStatus('saving');
-    
-    // Create updated profile
-    const updatedProfile: UserProfile = {
-      fullName,
-      email,
-      jobTitle,
-      phone,
-      timeZone,
-      language
-    };
-    
-    // Simulate saving delay
-    setTimeout(() => {
-      try {
-        // Update the profile in the parent component
-        onUpdateProfile(updatedProfile);
-        
-        setSaveStatus('saved');
-        setTimeout(() => setSaveStatus(null), 3000);
-      } catch (error) {
-        console.error('Error saving settings:', error);
-        setSaveStatus('error');
-        setTimeout(() => setSaveStatus(null), 3000);
-      }
-    }, 1000);
+    try {
+      const { data: { user: u } } = await supabase.auth.getUser();
+      if (!u) throw new Error('Not authenticated');
+
+      const { error } = await supabase.from('profiles').update({
+        full_name: fullName,
+        phone,
+        job_title: jobTitle,
+        time_zone: timeZone,
+        language,
+        updated_at: new Date().toISOString(),
+      }).eq('id', u.id);
+
+      if (error) throw error;
+
+      onUpdateProfile({ fullName, email, jobTitle, phone, timeZone, language });
+      setSaveStatus('saved');
+      setTimeout(() => setSaveStatus(null), 3000);
+    } catch (err) {
+      console.error('Error saving settings:', err);
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus(null), 3000);
+    }
   };
 
-  const handleUpdateCredentials = () => {
-    // Validation
-    if (!newUsername.trim()) {
-      setCredentialUpdateStatus('error');
-      return;
-    }
-    
-    if (!newPassword) {
-      setCredentialUpdateStatus('error');
-      return;
-    }
-    
-    if (newPassword !== confirmPassword) {
-      setCredentialUpdateStatus('error');
-      return;
-    }
+  const handleUpdateCredentials = async () => {
+    if (!newPassword) { setCredentialUpdateStatus('error'); return; }
+    if (newPassword !== confirmPassword) { setCredentialUpdateStatus('error'); return; }
+    if (newPassword.length < 6) { setCredentialUpdateStatus('error'); return; }
 
     setCredentialUpdateStatus('saving');
-    
-    // Simulate saving
-    setTimeout(() => {
-      try {
-        const newCredentials = {
-          username: newUsername.trim(),
-          password: newPassword
-        };
-        
-        // Save to localStorage
-        localStorage.setItem('govrise-credentials', JSON.stringify(newCredentials));
-        
-        // Update current credentials
-        setCurrentCredentials(newCredentials);
-        
-        // Clear password fields
-        setNewPassword('');
-        setConfirmPassword('');
-        
-        setCredentialUpdateStatus('saved');
-        setTimeout(() => setCredentialUpdateStatus(null), 3000);
-      } catch (error) {
-        console.error('Error saving credentials:', error);
-        setCredentialUpdateStatus('error');
-        setTimeout(() => setCredentialUpdateStatus(null), 3000);
-      }
-    }, 1000);
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) throw error;
+      setNewPassword('');
+      setConfirmPassword('');
+      setCredentialUpdateStatus('saved');
+      setTimeout(() => setCredentialUpdateStatus(null), 3000);
+    } catch (err) {
+      console.error('Error updating password:', err);
+      setCredentialUpdateStatus('error');
+      setTimeout(() => setCredentialUpdateStatus(null), 3000);
+    }
   };
 
   // Get display name for user

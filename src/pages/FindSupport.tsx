@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Search, Phone, Mail, Globe, MapPin, Star, Filter, CheckCircle, MessageSquare, Users, Scale, Heart, Building2, ChevronDown } from 'lucide-react';
+import { Search, Phone, Mail, Globe, MapPin, Star, CheckCircle, MessageSquare, Users, Scale, Heart, Building2, X, AlertCircle } from 'lucide-react';
+import { supabase } from '../utils/supabase';
 
 const categories = ['All', 'Legal Aid', 'NGO', 'Government', 'Medical', 'Counselling', 'Housing'];
 
@@ -108,10 +109,104 @@ const supportProviders = [
   },
 ];
 
+interface RequestModalProps {
+  provider: typeof supportProviders[0];
+  onClose: () => void;
+}
+
+const RequestModal = ({ provider, onClose }: RequestModalProps) => {
+  const [message, setMessage] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [done, setDone] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setError('');
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const { error: dbError } = await supabase.from('support_requests').insert({
+        user_id: user?.id ?? null,
+        provider_name: provider.name,
+        provider_category: provider.category,
+        message,
+        contact_phone: provider.phone,
+        contact_email: provider.email,
+      });
+      if (dbError) throw dbError;
+      setDone(true);
+    } catch (err: any) {
+      setError(err.message || 'Failed to submit request. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md">
+        <div className="flex items-center justify-between p-5 border-b border-gray-100">
+          <h3 className="font-semibold text-gray-900">Request Help from {provider.name}</h3>
+          <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-lg"><X size={18} /></button>
+        </div>
+        {done ? (
+          <div className="p-8 text-center">
+            <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <CheckCircle size={28} className="text-green-600" />
+            </div>
+            <h4 className="font-bold text-gray-900 mb-1">Request Submitted</h4>
+            <p className="text-sm text-gray-500 mb-4">{provider.name} will contact you within 1–2 business days.</p>
+            <button onClick={onClose} className="bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-blue-700">Done</button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="p-5 space-y-4">
+            <div className="bg-gray-50 rounded-lg p-3 flex items-start space-x-3">
+              <div className={`p-2 rounded-lg ${provider.iconBg} flex-shrink-0`}>{provider.icon}</div>
+              <div>
+                <p className="font-medium text-sm text-gray-900">{provider.name}</p>
+                <p className="text-xs text-gray-500">{provider.category} · {provider.location}</p>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Describe your situation *</label>
+              <textarea
+                value={message}
+                onChange={e => setMessage(e.target.value)}
+                required
+                rows={4}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Briefly explain what help you need and your current situation..."
+              />
+            </div>
+            {error && (
+              <div className="flex items-center p-3 bg-red-50 border border-red-200 rounded-lg space-x-2">
+                <AlertCircle size={15} className="text-red-600 flex-shrink-0" />
+                <p className="text-sm text-red-700">{error}</p>
+              </div>
+            )}
+            <div className="flex space-x-3">
+              <button type="button" onClick={onClose}
+                className="flex-1 border border-gray-300 text-gray-700 py-2 rounded-lg text-sm font-medium hover:bg-gray-50">
+                Cancel
+              </button>
+              <button type="submit" disabled={submitting}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white py-2 rounded-lg text-sm font-medium flex items-center justify-center">
+                {submitting ? <><div className="animate-spin h-4 w-4 border-b-2 border-white rounded-full mr-2" />Sending...</> : 'Send Request'}
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+};
+
 export const FindSupport = () => {
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
   const [showAvailableOnly, setShowAvailableOnly] = useState(false);
+  const [requestingProvider, setRequestingProvider] = useState<typeof supportProviders[0] | null>(null);
 
   const filtered = supportProviders.filter(provider => {
     const matchesCategory = activeCategory === 'All' || provider.category === activeCategory;
@@ -125,6 +220,9 @@ export const FindSupport = () => {
 
   return (
     <div className="h-full">
+      {requestingProvider && (
+        <RequestModal provider={requestingProvider} onClose={() => setRequestingProvider(null)} />
+      )}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-800 mb-1">Find Support</h1>
         <p className="text-gray-600">Connect with lawyers, NGOs, government agencies, and other support services near you.</p>
@@ -251,7 +349,9 @@ export const FindSupport = () => {
 
               {/* Actions */}
               <div className="flex space-x-2">
-                <button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center">
+                <button
+                  onClick={() => setRequestingProvider(provider)}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center">
                   <MessageSquare size={14} className="mr-1.5" /> Request Help
                 </button>
                 <button className="flex-1 bg-white border border-gray-300 text-gray-700 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors flex items-center justify-center">

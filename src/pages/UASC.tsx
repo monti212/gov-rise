@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Shield, AlertTriangle, CheckCircle, Phone, Mail, ChevronRight, Users, BookOpen, Heart, Lock, Globe, FileText, HelpCircle, ArrowRight } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Shield, AlertTriangle, CheckCircle, Phone, ChevronRight, Users, BookOpen, Heart, Lock, Globe, ArrowRight, Plus, X, Loader2, RefreshCw } from 'lucide-react';
+import { supabase } from '../utils/supabase';
 
 // Gate: must confirm they are a responsible adult or authorised supporter
 const AccessGate = ({ onConfirm }: { onConfirm: (role: string) => void }) => (
@@ -119,10 +120,110 @@ const emergencyContacts = [
   { name: 'Australian Children\'s Commissioner', phone: '1800 020 080', available: 'Mon–Fri 9am–5pm AEST' },
 ];
 
+type UascCase = {
+  id: string;
+  child_name: string;
+  date_of_birth: string | null;
+  gender: string | null;
+  nationality: string | null;
+  origin_country: string | null;
+  guardian_name: string | null;
+  guardian_role: string | null;
+  current_location: string | null;
+  family_tracing: boolean;
+  status: string;
+  notes: string | null;
+  created_at: string;
+};
+
+const STATUS_COLORS: Record<string, string> = {
+  active: 'bg-blue-100 text-blue-700',
+  family_found: 'bg-yellow-100 text-yellow-700',
+  reunified: 'bg-green-100 text-green-700',
+  resettled: 'bg-purple-100 text-purple-700',
+  closed: 'bg-gray-100 text-gray-600',
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  active: 'Active',
+  family_found: 'Family Found',
+  reunified: 'Reunified',
+  resettled: 'Resettled',
+  closed: 'Closed',
+};
+
+const BLANK_FORM = {
+  child_name: '',
+  date_of_birth: '',
+  gender: '',
+  nationality: '',
+  origin_country: '',
+  guardian_name: '',
+  guardian_role: '',
+  current_location: '',
+  family_tracing: false,
+  notes: '',
+};
+
 export const UASC = () => {
   const [accessGranted, setAccessGranted] = useState(false);
   const [userRole, setUserRole] = useState('');
   const [activeTab, setActiveTab] = useState('overview');
+
+  // Supabase state
+  const [cases, setCases] = useState<UascCase[]>([]);
+  const [loadingCases, setLoadingCases] = useState(false);
+  const [showRegisterForm, setShowRegisterForm] = useState(false);
+  const [form, setForm] = useState(BLANK_FORM);
+  const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState('');
+  const [formSuccess, setFormSuccess] = useState(false);
+
+  const fetchCases = async () => {
+    setLoadingCases(true);
+    const { data, error } = await supabase
+      .from('uasc_cases')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(50);
+    if (!error && data) setCases(data as UascCase[]);
+    setLoadingCases(false);
+  };
+
+  useEffect(() => {
+    if (accessGranted) fetchCases();
+  }, [accessGranted]);
+
+  const handleSubmitCase = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormError('');
+    if (!form.child_name.trim()) { setFormError('Child name is required.'); return; }
+    setSubmitting(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    const { error } = await supabase.from('uasc_cases').insert({
+      caseworker_id: user?.id ?? null,
+      child_name: form.child_name.trim(),
+      date_of_birth: form.date_of_birth || null,
+      gender: form.gender || null,
+      nationality: form.nationality || null,
+      origin_country: form.origin_country || null,
+      guardian_name: form.guardian_name || null,
+      guardian_role: form.guardian_role || null,
+      current_location: form.current_location || null,
+      family_tracing: form.family_tracing,
+      notes: form.notes || null,
+      status: 'active',
+    });
+    if (error) {
+      setFormError(error.message);
+    } else {
+      setFormSuccess(true);
+      setForm(BLANK_FORM);
+      fetchCases();
+      setTimeout(() => { setFormSuccess(false); setShowRegisterForm(false); }, 2000);
+    }
+    setSubmitting(false);
+  };
 
   const handleConfirm = (role: string) => {
     setUserRole(role);
@@ -199,8 +300,8 @@ export const UASC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             {[
               { label: 'Children Supported Globally', value: '2.4M+', color: 'text-blue-600' },
-              { label: 'Active Cases on Platform', value: '347', color: 'text-green-600' },
-              { label: 'Partner Organisations', value: '18', color: 'text-purple-600' },
+              { label: 'Active Cases on Platform', value: loadingCases ? '…' : cases.filter(c => c.status === 'active').length.toString(), color: 'text-green-600' },
+              { label: 'Total Cases Registered', value: loadingCases ? '…' : cases.length.toString(), color: 'text-purple-600' },
             ].map((stat, i) => (
               <div key={i} className="bg-white border border-gray-200 rounded-lg p-5 text-center shadow-sm">
                 <div className={`text-3xl font-bold mb-1 ${stat.color}`}>{stat.value}</div>
@@ -240,9 +341,151 @@ export const UASC = () => {
               <h3 className="font-semibold text-blue-900 mb-1">Register a Child for Support</h3>
               <p className="text-sm text-blue-700">Start the formal registration and case management process for a UASC in your care.</p>
             </div>
-            <button className="bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors flex items-center whitespace-nowrap ml-4">
+            <button
+              onClick={() => { setShowRegisterForm(true); setFormError(''); setFormSuccess(false); }}
+              className="bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors flex items-center whitespace-nowrap ml-4">
               Start Registration <ArrowRight size={14} className="ml-1.5" />
             </button>
+          </div>
+
+          {/* Cases List */}
+          <div className="mt-6 bg-white border border-gray-200 rounded-lg shadow-sm">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+              <h3 className="font-semibold text-gray-900">Registered Cases</h3>
+              <button onClick={fetchCases} className="text-gray-400 hover:text-gray-600">
+                <RefreshCw size={15} />
+              </button>
+            </div>
+            {loadingCases ? (
+              <div className="flex items-center justify-center py-10 text-gray-400">
+                <Loader2 size={20} className="animate-spin mr-2" /> Loading cases…
+              </div>
+            ) : cases.length === 0 ? (
+              <div className="py-10 text-center text-gray-400 text-sm">No cases registered yet.</div>
+            ) : (
+              <div className="divide-y divide-gray-100">
+                {cases.map(c => (
+                  <div key={c.id} className="px-5 py-3 flex items-center justify-between hover:bg-gray-50">
+                    <div>
+                      <p className="font-medium text-gray-900 text-sm">{c.child_name}</p>
+                      <p className="text-xs text-gray-500">{c.nationality ?? '—'} · {c.current_location ?? 'Location unknown'} · {new Date(c.created_at).toLocaleDateString()}</p>
+                    </div>
+                    <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${STATUS_COLORS[c.status] ?? 'bg-gray-100 text-gray-600'}`}>
+                      {STATUS_LABELS[c.status] ?? c.status}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Register Case Modal */}
+      {showRegisterForm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg my-4">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+              <h2 className="font-bold text-gray-900 text-lg">Register UASC Case</h2>
+              <button onClick={() => setShowRegisterForm(false)} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
+            </div>
+
+            {formSuccess ? (
+              <div className="flex flex-col items-center justify-center py-10">
+                <CheckCircle size={40} className="text-green-500 mb-3" />
+                <p className="font-semibold text-gray-900">Case Registered</p>
+                <p className="text-sm text-gray-500">The case has been saved successfully.</p>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmitCase} className="p-6 space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="col-span-2">
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Child's Full Name *</label>
+                    <input value={form.child_name} onChange={e => setForm(f => ({ ...f, child_name: e.target.value }))} required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter full name" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Date of Birth</label>
+                    <input type="date" value={form.date_of_birth} onChange={e => setForm(f => ({ ...f, date_of_birth: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Gender</label>
+                    <select value={form.gender} onChange={e => setForm(f => ({ ...f, gender: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                      <option value="">Select…</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                      <option value="other">Other</option>
+                      <option value="undisclosed">Prefer not to say</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Nationality</label>
+                    <input value={form.nationality} onChange={e => setForm(f => ({ ...f, nationality: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="e.g. Syrian" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Country of Origin</label>
+                    <input value={form.origin_country} onChange={e => setForm(f => ({ ...f, origin_country: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="e.g. Syria" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Guardian Name</label>
+                    <input value={form.guardian_name} onChange={e => setForm(f => ({ ...f, guardian_name: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="If applicable" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Guardian Role</label>
+                    <select value={form.guardian_role} onChange={e => setForm(f => ({ ...f, guardian_role: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                      <option value="">Select…</option>
+                      <option value="parent">Parent</option>
+                      <option value="relative">Relative</option>
+                      <option value="legal_guardian">Legal Guardian</option>
+                      <option value="ngo">NGO Worker</option>
+                      <option value="caseworker">Caseworker</option>
+                    </select>
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Current Location</label>
+                    <input value={form.current_location} onChange={e => setForm(f => ({ ...f, current_location: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="City, Country or facility name" />
+                  </div>
+                  <div className="col-span-2">
+                    <label className="flex items-center space-x-2 cursor-pointer">
+                      <input type="checkbox" checked={form.family_tracing} onChange={e => setForm(f => ({ ...f, family_tracing: e.target.checked }))}
+                        className="w-4 h-4 text-blue-600 rounded" />
+                      <span className="text-sm text-gray-700">Family tracing has been initiated</span>
+                    </label>
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Notes</label>
+                    <textarea value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} rows={3}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Any additional information about the case…" />
+                  </div>
+                </div>
+
+                {formError && (
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">{formError}</div>
+                )}
+
+                <div className="flex justify-end space-x-3 pt-2">
+                  <button type="button" onClick={() => setShowRegisterForm(false)}
+                    className="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                  <button type="submit" disabled={submitting}
+                    className="px-5 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg text-sm font-medium flex items-center">
+                    {submitting ? <><Loader2 size={14} className="animate-spin mr-2" />Saving…</> : <><Plus size={14} className="mr-1.5" />Register Case</>}
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
       )}
