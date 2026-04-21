@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { Eye, EyeOff, Globe, AlertCircle, CheckCircle, User, Mail, Phone, Lock } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Eye, EyeOff, Globe, AlertCircle, CheckCircle, User, Mail, Phone, Lock, ArrowLeft } from 'lucide-react';
 import { supabase } from '../../utils/supabase';
 
 export const LoginPage = () => {
-  const [mode, setMode] = useState<'login' | 'register'>('login');
+  const [mode, setMode] = useState<'login' | 'register' | 'forgot' | 'reset'>('login');
 
   // Login state
   const [loginEmail, setLoginEmail] = useState('');
@@ -21,6 +21,55 @@ export const LoginPage = () => {
   const [regRole, setRegRole] = useState('refugee');
   const [agreedTerms, setAgreedTerms] = useState(false);
   const [regSuccess, setRegSuccess] = useState(false);
+
+  // Forgot / reset password state
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotSent, setForgotSent] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [newPasswordConfirm, setNewPasswordConfirm] = useState('');
+  const [resetSuccess, setResetSuccess] = useState(false);
+
+  // Detect password-recovery session from Supabase redirect
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setMode('reset');
+        setError('');
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setIsLoading(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
+      redirectTo: window.location.origin,
+    });
+    if (error) {
+      setError(error.message);
+    } else {
+      setForgotSent(true);
+    }
+    setIsLoading(false);
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    if (newPassword !== newPasswordConfirm) { setError('Passwords do not match.'); return; }
+    if (newPassword.length < 6) { setError('Password must be at least 6 characters.'); return; }
+    setIsLoading(true);
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) {
+      setError(error.message);
+    } else {
+      setResetSuccess(true);
+      setTimeout(() => { setMode('login'); setResetSuccess(false); setNewPassword(''); setNewPasswordConfirm(''); }, 2500);
+    }
+    setIsLoading(false);
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,19 +127,120 @@ export const LoginPage = () => {
 
         {/* Card */}
         <div className="bg-white rounded-xl shadow-xl overflow-hidden">
-          {/* Tab Toggle */}
-          <div className="flex border-b border-gray-200">
-            <button onClick={() => { setMode('login'); setError(''); }}
-              className={`flex-1 py-3 text-sm font-medium transition-colors ${mode === 'login' ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50' : 'text-gray-500 hover:text-gray-700'}`}>
-              Sign In
-            </button>
-            <button onClick={() => { setMode('register'); setError(''); }}
-              className={`flex-1 py-3 text-sm font-medium transition-colors ${mode === 'register' ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50' : 'text-gray-500 hover:text-gray-700'}`}>
-              Create Account
-            </button>
-          </div>
+          {/* Tab Toggle — hidden during forgot/reset flows */}
+          {(mode === 'login' || mode === 'register') && (
+            <div className="flex border-b border-gray-200">
+              <button onClick={() => { setMode('login'); setError(''); }}
+                className={`flex-1 py-3 text-sm font-medium transition-colors ${mode === 'login' ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50' : 'text-gray-500 hover:text-gray-700'}`}>
+                Sign In
+              </button>
+              <button onClick={() => { setMode('register'); setError(''); }}
+                className={`flex-1 py-3 text-sm font-medium transition-colors ${mode === 'register' ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50' : 'text-gray-500 hover:text-gray-700'}`}>
+                Create Account
+              </button>
+            </div>
+          )}
 
           <div className="p-6">
+            {/* ── FORGOT PASSWORD ── */}
+            {mode === 'forgot' && (
+              <div>
+                <button onClick={() => { setMode('login'); setError(''); setForgotSent(false); }}
+                  className="flex items-center text-sm text-gray-500 hover:text-gray-700 mb-4">
+                  <ArrowLeft size={14} className="mr-1" /> Back to Sign In
+                </button>
+                {forgotSent ? (
+                  <div className="text-center py-4">
+                    <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <CheckCircle size={28} className="text-green-600" />
+                    </div>
+                    <h3 className="font-bold text-gray-900 mb-1">Check your email</h3>
+                    <p className="text-sm text-gray-500 mb-1">We sent a password reset link to</p>
+                    <p className="text-sm font-medium text-gray-700 mb-4">{forgotEmail}</p>
+                    <p className="text-xs text-gray-400">Click the link in the email to set a new password. You may close this tab.</p>
+                  </div>
+                ) : (
+                  <form onSubmit={handleForgotPassword} className="space-y-4">
+                    <div>
+                      <h3 className="font-bold text-gray-900 mb-1">Reset your password</h3>
+                      <p className="text-sm text-gray-500 mb-4">Enter your email and we'll send you a reset link.</p>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                      <div className="relative">
+                        <Mail size={16} className="absolute left-3 top-3 text-gray-400" />
+                        <input type="email" value={forgotEmail} onChange={e => setForgotEmail(e.target.value)} required
+                          className="w-full pl-9 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                          placeholder="you@example.com" />
+                      </div>
+                    </div>
+                    {error && (
+                      <div className="flex items-center p-3 bg-red-50 border border-red-200 rounded-lg">
+                        <AlertCircle size={16} className="text-red-600 mr-2 flex-shrink-0" />
+                        <span className="text-red-700 text-sm">{error}</span>
+                      </div>
+                    )}
+                    <button type="submit" disabled={isLoading}
+                      className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white py-2.5 rounded-lg font-medium text-sm transition-colors flex items-center justify-center">
+                      {isLoading
+                        ? <><div className="animate-spin h-4 w-4 border-b-2 border-white rounded-full mr-2" />Sending…</>
+                        : 'Send Reset Link'}
+                    </button>
+                  </form>
+                )}
+              </div>
+            )}
+
+            {/* ── RESET PASSWORD (from email link) ── */}
+            {mode === 'reset' && (
+              <div>
+                {resetSuccess ? (
+                  <div className="text-center py-4">
+                    <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <CheckCircle size={28} className="text-green-600" />
+                    </div>
+                    <h3 className="font-bold text-gray-900 mb-1">Password updated!</h3>
+                    <p className="text-sm text-gray-500">Taking you back to Sign In…</p>
+                  </div>
+                ) : (
+                  <form onSubmit={handleResetPassword} className="space-y-4">
+                    <div>
+                      <h3 className="font-bold text-gray-900 mb-1">Set a new password</h3>
+                      <p className="text-sm text-gray-500 mb-4">Choose a strong password for your account.</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+                      <div className="relative">
+                        <Lock size={16} className="absolute left-3 top-3 text-gray-400" />
+                        <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} required
+                          className="w-full pl-9 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                          placeholder="Min 6 characters" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
+                      <div className="relative">
+                        <Lock size={16} className="absolute left-3 top-3 text-gray-400" />
+                        <input type="password" value={newPasswordConfirm} onChange={e => setNewPasswordConfirm(e.target.value)} required
+                          className="w-full pl-9 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                          placeholder="Repeat new password" />
+                      </div>
+                    </div>
+                    {error && (
+                      <div className="flex items-center p-3 bg-red-50 border border-red-200 rounded-lg">
+                        <AlertCircle size={16} className="text-red-600 mr-2 flex-shrink-0" />
+                        <span className="text-red-700 text-sm">{error}</span>
+                      </div>
+                    )}
+                    <button type="submit" disabled={isLoading}
+                      className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white py-2.5 rounded-lg font-medium text-sm transition-colors flex items-center justify-center">
+                      {isLoading
+                        ? <><div className="animate-spin h-4 w-4 border-b-2 border-white rounded-full mr-2" />Updating…</>
+                        : 'Update Password'}
+                    </button>
+                  </form>
+                )}
+              </div>
+            )}
+
             {/* ── LOGIN ── */}
             {mode === 'login' && (
               <form onSubmit={handleLogin} className="space-y-4">
@@ -104,7 +254,11 @@ export const LoginPage = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-sm font-medium text-gray-700">Password</label>
+                    <button type="button" onClick={() => { setMode('forgot'); setForgotEmail(loginEmail); setError(''); }}
+                      className="text-xs text-blue-600 hover:underline">Forgot password?</button>
+                  </div>
                   <div className="relative">
                     <Lock size={16} className="absolute left-3 top-3 text-gray-400" />
                     <input type={showPassword ? 'text' : 'password'} value={loginPassword} onChange={e => setLoginPassword(e.target.value)} required
