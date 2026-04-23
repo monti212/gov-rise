@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot, Loader2, BookOpen, AlertCircle } from 'lucide-react';
 import { supabase } from '../../utils/supabase';
-import { uhuruChatStream, uhuruChat } from '../../utils/uhuru';
 import type { Message } from '../../utils/uhuru';
 
 type ChatMessage = {
@@ -94,18 +93,15 @@ export const ChatInterface = () => {
         { role: 'user', content: text },
       ];
 
-      // 3. Try streaming first, fall back to non-streaming
-      let fullResponse = '';
-      try {
-        await uhuruChatStream(apiMessages, (chunk) => {
-          fullResponse += chunk;
-          setStreamingText(fullResponse);
-        });
-      } catch {
-        // Streaming failed (e.g. CORS on SSE), fall back to regular call
-        fullResponse = await uhuruChat(apiMessages);
-      }
+      // 3. Call Uhuru AI via Supabase Edge Function (avoids CORS)
+      const { data: fnData, error: fnError } = await supabase.functions.invoke('ai-chat', {
+        body: { messages: apiMessages },
+      });
 
+      if (fnError) throw new Error(fnError.message);
+      if (fnData?.error) throw new Error(fnData.error);
+
+      const fullResponse: string = fnData?.choices?.[0]?.message?.content ?? '(no response)';
       setStreamingText('');
       const assistantMsg: ChatMessage = {
         role: 'assistant',
