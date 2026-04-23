@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { HomeIcon, BookOpen, Users, MessageSquare, BarChart3, Settings, HelpCircle, Globe, User, HeartHandshake, Route, Shield, ClipboardList } from 'lucide-react';
+import { HomeIcon, BookOpen, Users, MessageSquare, BarChart3, Settings, HelpCircle, Globe, User, HeartHandshake, Route, Shield, ClipboardList, Brain } from 'lucide-react';
 
 interface UserProfile {
   fullName: string;
@@ -35,6 +35,7 @@ export const Sidebar = ({ currentPath, user }: SidebarProps) => {
     { icon: <ClipboardList size={20} />, text: 'Registration', path: '/registration', active: currentPath === '/registration' },
     { icon: <Users size={20} />, text: 'Collaboration', path: '/collaboration', active: currentPath === '/collaboration' },
     { icon: <MessageSquare size={20} />, text: 'Support System', path: '/support', active: currentPath === '/support' },
+    { icon: <Brain size={20} />, text: 'Knowledge Base', path: '/knowledge-base', active: currentPath === '/knowledge-base' },
     { icon: <BarChart3 size={20} />, text: 'Reports', path: '/reports', active: currentPath === '/reports' },
     { icon: <Settings size={20} />, text: 'Settings', path: '/settings', active: currentPath === '/settings' },
     { icon: <HelpCircle size={20} />, text: 'Help Center', path: '/help', active: currentPath === '/help' },

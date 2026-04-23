@@ -19,6 +19,7 @@ import { UASC } from './pages/UASC';
 import { Registration } from './pages/Registration';
 import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { TermsOfService } from './pages/TermsOfService';
+import { KnowledgeBase } from './pages/KnowledgeBase';
 import { Sidebar } from './components/Layout/Sidebar';
 import { Header } from './components/Layout/Header';
 import { Footer } from './components/Layout/Footer';
@@ -76,6 +77,7 @@ function MainLayout({ user, onLogout, onUpdateProfile }: {
             <Route path="/find-support" element={<FindSupport />} />
             <Route path="/uasc" element={<UASC />} />
             <Route path="/registration" element={<Registration />} />
+            <Route path="/knowledge-base" element={<KnowledgeBase />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<TermsOfService />} />
           </Routes>

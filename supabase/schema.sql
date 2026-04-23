@@ -344,3 +344,60 @@ alter publication supabase_realtime add table public.registrations;
 -- ─── STORAGE BUCKET ─────────────────────────────────────────
 -- Run this separately if needed:
 -- insert into storage.buckets (id, name, public) values ('documents', 'documents', false);
+
+-- ─── KNOWLEDGE BASE (AI / RAG) ──────────────────────────────
+-- Store documents and URL content used to power the AI assistant
+
+create table if not exists public.knowledge_documents (
+  id          uuid primary key default uuid_generate_v4(),
+  title       text not null,
+  source_url  text,
+  source_type text not null default 'manual'
+                check (source_type in ('manual', 'url', 'pdf')),
+  category    text not null default 'general'
+                check (category in ('general','unhcr','government','legal','policy','training')),
+  content     text not null,
+  added_by    uuid references auth.users(id) on delete set null,
+  created_at  timestamptz not null default now()
+);
+
+-- Full-text search index (English + multilingual fallback)
+create index if not exists knowledge_documents_fts
+  on public.knowledge_documents
+  using gin(to_tsvector('english', coalesce(title,'') || ' ' || coalesce(content,'')));
+
+alter table public.knowledge_documents enable row level security;
+
+-- Anyone authenticated can read knowledge documents
+create policy "Authenticated users can read knowledge base"
+  on public.knowledge_documents for select
+  using (auth.uid() is not null);
+
+-- Only caseworkers/admins/ngo can add or delete
+create policy "Staff can manage knowledge base"
+  on public.knowledge_documents for all
+  using (
+    exists (
+      select 1 from public.profiles
+      where id = auth.uid() and role in ('caseworker','ngo','government','admin')
+    )
+  );
+
+-- Chat history
+create table if not exists public.chat_messages (
+  id          uuid primary key default uuid_generate_v4(),
+  user_id     uuid references auth.users(id) on delete cascade,
+  role        text not null check (role in ('user','assistant')),
+  content     text not null,
+  created_at  timestamptz not null default now()
+);
+
+alter table public.chat_messages enable row level security;
+
+create policy "Users can read their own chat history"
+  on public.chat_messages for select
+  using (auth.uid() = user_id);
+
+create policy "Users can insert their own messages"
+  on public.chat_messages for insert
+  with check (auth.uid() = user_id);
