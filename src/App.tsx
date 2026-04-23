@@ -26,7 +26,7 @@ import { Footer } from './components/Layout/Footer';
 import { LoginPage } from './components/Auth/LoginPage';
 import { RealtimeProvider } from './context/RealtimeContext';
 import { supabase } from './utils/supabase';
-import type { User, Session } from '@supabase/supabase-js';
+import type { Session } from '@supabase/supabase-js';
 
 interface UserProfile {
   fullName: string;
@@ -92,54 +92,63 @@ function App() {
   const [user, setUser] = useState<AppUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const buildAppUser = async (supabaseUser: User): Promise<AppUser> => {
-    // Fetch profile from Supabase
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', supabaseUser.id)
-      .single();
-
-    return {
-      id: supabaseUser.id,
-      username: profile?.full_name || supabaseUser.email?.split('@')[0] || 'user',
-      email: supabaseUser.email || '',
-      isAuthenticated: true,
-      profile: {
-        fullName: profile?.full_name || '',
-        email: supabaseUser.email || '',
-        jobTitle: profile?.job_title || '',
-        phone: profile?.phone || '',
-        timeZone: profile?.time_zone || 'UTC',
-        language: profile?.language || 'en',
-        role: profile?.role || 'refugee',
-      },
-    };
-  };
-
   useEffect(() => {
-    // Check for existing session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session?.user) {
-        const appUser = await buildAppUser(session.user);
-        setUser(appUser);
-      }
-      setIsLoading(false);
-    });
+    // Safety net: never show spinner forever — resolve after 6 seconds regardless
+    const timeout = setTimeout(() => setIsLoading(false), 6000);
 
-    // Listen for auth changes (login, logout, token refresh)
+    // onAuthStateChange fires INITIAL_SESSION on page load, so no need for getSession()
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session: Session | null) => {
+      async (event, session: Session | null) => {
         if (session?.user) {
-          const appUser = await buildAppUser(session.user);
-          setUser(appUser);
+          // Build user immediately with just auth data so UI unblocks fast
+          const quickUser: AppUser = {
+            id: session.user.id,
+            username: session.user.email?.split('@')[0] || 'user',
+            email: session.user.email || '',
+            isAuthenticated: true,
+            profile: {
+              fullName: '',
+              email: session.user.email || '',
+              jobTitle: '',
+              phone: '',
+              timeZone: 'UTC',
+              language: 'en',
+              role: 'refugee',
+            },
+          };
+          setUser(quickUser);
+          setIsLoading(false);
+
+          // Then fetch full profile in background and update
+          supabase.from('profiles').select('*').eq('id', session.user.id).single()
+            .then(({ data: profile }) => {
+              if (profile) {
+                setUser(prev => prev ? {
+                  ...prev,
+                  username: profile.full_name || prev.username,
+                  profile: {
+                    fullName: profile.full_name || '',
+                    email: session.user.email || '',
+                    jobTitle: profile.job_title || '',
+                    phone: profile.phone || '',
+                    timeZone: profile.time_zone || 'UTC',
+                    language: profile.language || 'en',
+                    role: profile.role || 'refugee',
+                  },
+                } : prev);
+              }
+            });
         } else {
           setUser(null);
+          setIsLoading(false);
         }
       }
     );
 
-    return () => subscription.unsubscribe();
+    return () => {
+      clearTimeout(timeout);
+      subscription.unsubscribe();
+    };
   }, []);
 
   const handleLogout = async () => {
